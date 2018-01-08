@@ -35,6 +35,7 @@
 #if (UART7_ENABLE)
   /* Definition for UART7 peripheral configuration */
   #define UART7_BAUDRATE                         115200
+  #define UART7_RX_CACHE_SIZE                    (1 << 8) /* !!! MAX = 256 !!! */
   /* Definition for UART7 clock resources */
   #define UART7_CLK_ENABLE()                     __UART7_CLK_ENABLE()
   #define UART7_FORCE_RESET()                    __UART7_FORCE_RESET()
@@ -70,6 +71,7 @@
 #if (UART8_ENABLE)
   /* Definition for UART8 peripheral configuration */
   #define UART8_BAUDRATE                         115200
+  #define UART8_RX_CACHE_SIZE                    (1 << 8) /* !!! MAX = 256 !!! */
   /* Definition for UART8 clock resources */
   #define UART8_CLK_ENABLE()                     __UART8_CLK_ENABLE()
   #define UART8_FORCE_RESET()                    __UART8_FORCE_RESET()
@@ -105,6 +107,7 @@
 /* Exported functions ------------------------------------------------------- */
 HAL_StatusTypeDef MCU_UARTs_Init(void);
 #if (UART7_ENABLE)
+  HAL_StatusTypeDef Uart7PullOneByte(uint8_t *pByte);
 #if (UART7_TX_DMA_ENABLE)
   HAL_StatusTypeDef Uart7SendBuffer_DMA(void *pBuffer, uint16_t len);
 
@@ -115,6 +118,7 @@ HAL_StatusTypeDef MCU_UARTs_Init(void);
 #endif /* UART7_RX_DMA_ENABLE */
 #endif /* UART7_ENABLE */
 #if (UART8_ENABLE)
+  HAL_StatusTypeDef Uart8PullOneByte(uint8_t *pByte);
 #if (UART8_TX_DMA_ENABLE)
   HAL_StatusTypeDef Uart8SendBuffer_DMA(void *pBuffer, uint16_t len);
 

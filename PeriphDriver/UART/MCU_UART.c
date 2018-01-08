@@ -13,12 +13,23 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+#define UART_HW_CACHE_SIZE                    (8)
+#if (UART7_ENABLE)
+#define UART7_RX_COUNTER_MASK                 0xFF  /* (UART7_RX_CACHE_SIZE - 1) */
+#endif /* UART7_ENABLE */
+#if (UART8_ENABLE)
+#define UART8_RX_COUNTER_MASK                 0xFF  /* (UART8_RX_CACHE_SIZE - 1) */
+#endif /* UART8_ENABLE */
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* UART handler declaration */
 #if (UART7_ENABLE)
   static uint8_t _uart7_init = 0;
   static UART_HandleTypeDef Uart7Handle;
+  static uint8_t _uart7_cache_head = 0;
+  static uint8_t _uart7_cache_tail = 0;
+  static uint8_t UART7_RX_CACHE[UART7_RX_CACHE_SIZE] = {0};
+  static uint8_t _uart7_rx_buffer[UART_HW_CACHE_SIZE] = {0};
 #if (UART7_TX_DMA_ENABLE)
   static DMA_HandleTypeDef hdma_uart7_tx;
 #endif /* UART7_TX_DMA_ENABLE */
@@ -29,6 +40,10 @@
 #if (UART8_ENABLE)
   static uint8_t _uart8_init = 0;
   static UART_HandleTypeDef Uart8Handle;
+  static uint8_t _uart8_cache_head = 0;
+  static uint8_t _uart8_cache_tail = 0;
+  static uint8_t UART8_RX_CACHE[UART8_RX_CACHE_SIZE] = {0};
+  static uint8_t _uart8_rx_buffer[UART_HW_CACHE_SIZE] = {0};
 #if (UART8_TX_DMA_ENABLE)
   static DMA_HandleTypeDef hdma_uart8_tx;
 #endif /* UART8_TX_DMA_ENABLE */
@@ -72,6 +87,7 @@ HAL_StatusTypeDef MCU_UARTs_Init(void)
  */
 static HAL_StatusTypeDef UART7_PeriphInit(void)
 {
+	HAL_StatusTypeDef ret = HAL_OK;
 	/*##-1- Configure the UART peripheral ######################################*/
 	/* Put the UART peripheral in the Asynchronous mode (UART Mode) */
 	/* UART configured as follows:
@@ -89,13 +105,14 @@ static HAL_StatusTypeDef UART7_PeriphInit(void)
 	Uart7Handle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
 	Uart7Handle.Init.Mode       = UART_MODE_TX_RX;
 
-	if(HAL_UART_DeInit(&Uart7Handle) != HAL_OK) {
-		return HAL_ERROR;
-	}
-	if(HAL_UART_Init(&Uart7Handle) != HAL_OK) {
-		return HAL_ERROR;
-	}
-	return HAL_OK;
+	if((ret = HAL_UART_DeInit(&Uart7Handle)) != HAL_OK) return ret;
+	if((ret = HAL_UART_Init(&Uart7Handle)) != HAL_OK) return ret;
+#if (UART7_RX_DMA_ENABLE)
+	if((ret = HAL_UART_Receive_DMA(&Uart7Handle, _uart7_rx_buffer, UART_HW_CACHE_SIZE)) != HAL_OK) return ret;
+#else
+	if((ret = HAL_UART_Receive_IT(&Uart7Handle, _uart7_rx_buffer, UART_HW_CACHE_SIZE)) != HAL_OK) return ret;
+#endif /* UART7_RX_DMA_ENABLE */
+	return ret;
 }
 #endif /* UART7_ENABLE */
 #if (UART8_ENABLE)
@@ -106,6 +123,7 @@ static HAL_StatusTypeDef UART7_PeriphInit(void)
  */
 static HAL_StatusTypeDef UART8_PeriphInit(void)
 {
+	HAL_StatusTypeDef ret = HAL_OK;
 	/*##-1- Configure the UART peripheral ######################################*/
 	/* Put the UART peripheral in the Asynchronous mode (UART Mode) */
 	/* UART configured as follows:
@@ -123,17 +141,30 @@ static HAL_StatusTypeDef UART8_PeriphInit(void)
 	Uart8Handle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
 	Uart8Handle.Init.Mode       = UART_MODE_TX_RX;
 
-	if(HAL_UART_DeInit(&Uart8Handle) != HAL_OK) {
-		return HAL_ERROR;
-	}
-	if(HAL_UART_Init(&Uart8Handle) != HAL_OK) {
-		return HAL_ERROR;
-	}
+	if((ret = HAL_UART_DeInit(&Uart8Handle)) != HAL_OK) return ret;
+	if((ret = HAL_UART_Init(&Uart8Handle)) != HAL_OK) return ret;
+#if (UART8_RX_DMA_ENABLE)
+	if((ret = HAL_UART_Receive_DMA(&Uart8Handle, _uart8_rx_buffer, UART_HW_CACHE_SIZE)) != HAL_OK) return ret;
+#else
+	if((ret = HAL_UART_Receive_IT(&Uart8Handle, _uart8_rx_buffer, UART_HW_CACHE_SIZE)) != HAL_OK) return ret;
+#endif /* UART7_RX_DMA_ENABLE */
 	return HAL_OK;
 }
 #endif /* UART8_ENABLE */
 
 #if (UART7_ENABLE)
+/*
+ * @brief  read one byte from UART7 CACHE pool.
+ * @param  pByte: pointer to store the byte.
+ * @retval None
+ */
+HAL_StatusTypeDef Uart7PullOneByte(uint8_t *pByte)
+{
+	if(_uart7_cache_tail == _uart7_cache_head) return HAL_ERROR;
+	*pByte = UART7_RX_CACHE[_uart7_cache_tail];
+	_uart7_cache_tail ++; /* !!! type: uint8_t, max = 255 !!! */ /* (_uart7_cache_tail + 1) & UART7_RX_COUNTER_MASK; */
+	return HAL_OK;
+}
 #if (UART7_TX_DMA_ENABLE)
 /*
  * @brief  Send an amount of data in DMA mode.
@@ -148,6 +179,18 @@ HAL_StatusTypeDef Uart7SendBuffer_DMA(void *pBuffer, uint16_t len)
 #endif /* UART7_TX_DMA_ENABLE */
 #endif /* UART7_ENABLE */
 #if (UART8_ENABLE)
+/*
+ * @brief  read one byte from UART8 CACHE pool.
+ * @param  pByte: pointer to store the byte.
+ * @retval None
+ */
+HAL_StatusTypeDef Uart8PullOneByte(uint8_t *pByte)
+{
+	if(_uart8_cache_tail == _uart8_cache_head) return HAL_ERROR;
+	*pByte = UART8_RX_CACHE[_uart8_cache_tail];
+	_uart8_cache_tail ++; /* !!! type: uint8_t, max = 255 !!! */ /* (_uart8_cache_tail + 1) & UART8_RX_COUNTER_MASK; */
+	return HAL_OK;
+}
 #if (UART8_TX_DMA_ENABLE)
 /*
  * @brief  Send an amount of data in DMA mode.
@@ -161,6 +204,45 @@ HAL_StatusTypeDef Uart8SendBuffer_DMA(void *pBuffer, uint16_t len)
 }
 #endif /* UART8_TX_DMA_ENABLE */
 #endif /* UART8_ENABLE */
+
+/**
+  * @brief Rx Transfer completed callbacks
+  * @param huart: uart handle
+  * @retval None
+  */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+#if (UART7_ENABLE)
+	if(huart->Instance == UART7) {
+		for(uint8_t i = 0; i < UART_HW_CACHE_SIZE; i ++) {
+			if(((_uart7_cache_head + 1) & UART7_RX_COUNTER_MASK) != _uart7_cache_tail) {
+				UART7_RX_CACHE[_uart7_cache_head] = _uart7_rx_buffer[i];
+				_uart7_cache_head ++; /* !!! type: uint8_t, max = 255 !!! */
+			} else break;
+		}
+#if (UART7_RX_DMA_ENABLE)
+		if(HAL_UART_Receive_DMA(&Uart7Handle, _uart7_rx_buffer, UART_HW_CACHE_SIZE) != HAL_OK) return;
+#else
+		if(HAL_UART_Receive_IT(&Uart7Handle, _uart7_rx_buffer, UART_HW_CACHE_SIZE) != HAL_OK) return;
+#endif /* UART7_RX_DMA_ENABLE */
+	}
+#endif /* UART7_ENABLE */
+#if (UART8_ENABLE)
+	if(huart->Instance == UART8) {
+		for(uint8_t i = 0; i < UART_HW_CACHE_SIZE; i ++) {
+			if(((_uart8_cache_head + 1) & UART8_RX_COUNTER_MASK) != _uart8_cache_tail) {
+				UART8_RX_CACHE[_uart8_cache_head] = _uart8_rx_buffer[i];
+				_uart8_cache_head ++; /* !!! type: uint8_t, max = 255 !!! */
+			} else break;
+		}
+#if (UART8_RX_DMA_ENABLE)
+		if(HAL_UART_Receive_DMA(&Uart8Handle, _uart8_rx_buffer, UART_HW_CACHE_SIZE) != HAL_OK) return;
+#else
+		if(HAL_UART_Receive_IT(&Uart8Handle, _uart8_rx_buffer, UART_HW_CACHE_SIZE) != HAL_OK) return;
+#endif /* UART8_RX_DMA_ENABLE */
+	}
+#endif /* UART8_ENABLE */
+}
 
 /**
   * @brief UART GPIO Initialization
