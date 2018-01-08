@@ -6,6 +6,9 @@
 /* Debug Port Linker */
 #define DEBUG_PORT_SEND                          Uart7SendBuffer_DMA
 
+/* Wifi Port Linker */
+#define WIFI_PORT_GET_BYTE                       Uart8PullOneByte
+
 /* IMU ICM20602 Linker */
 #define IMU_SPI                                  SPI2
 #define IMU_TxRxData                             SPI2_TxRxData_DMA
