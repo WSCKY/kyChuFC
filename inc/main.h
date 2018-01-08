@@ -21,6 +21,7 @@
 #include "BoardLed.h"
 #include "BoardPower.h"
 #include "IMU_ICM20602.h"
+#include "WifiCP.h"
 
 #include "MCU_Periph.h"
 

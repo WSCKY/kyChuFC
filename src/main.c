@@ -15,10 +15,11 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-osThreadId LED_ThreadId, Uart_ThreadId;
+osThreadId HighThreadId, MiddThreadId, SlowThreadId;
 /* Private function prototypes -----------------------------------------------*/
-static void LED_ToggleThread(void const *p);
-static void UartSendThread(void const *p);
+static void SystemHighFreqThread(void const *p);
+static void SystemMiddFreqThread(void const *p);
+static void SystemSlowFreqThread(void const *p);
 static void SystemClock_Config(void);
 static void CPU_CACHE_Enable(void);
 
@@ -70,17 +71,19 @@ int main(void)
 
 	DEBUG_PORT_SEND("System Init!\n", 13);
 
-	osThreadDef(0, LED_ToggleThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
-	LED_ThreadId = osThreadCreate(osThread(0), NULL);
-	osThreadDef(1, UartSendThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
-	Uart_ThreadId = osThreadCreate(osThread(1), NULL);
+	osThreadDef(0, SystemHighFreqThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
+	HighThreadId = osThreadCreate(osThread(0), NULL);
+	osThreadDef(1, SystemMiddFreqThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
+	MiddThreadId = osThreadCreate(osThread(1), NULL);
+	osThreadDef(2, SystemSlowFreqThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
+	SlowThreadId = osThreadCreate(osThread(2), NULL);
 
 	osKernelStart();
 
 	for(;;);
 }
 
-static void LED_ToggleThread(void const *p)
+static void SystemHighFreqThread(void const *p)
 {
 	(void) p;
 	uint32_t PreviousWakeTime = osKernelSysTick();
@@ -90,7 +93,7 @@ static void LED_ToggleThread(void const *p)
 	}
 }
 
-static void UartSendThread(void const *p)
+static void SystemMiddFreqThread(void const *p)
 {
 	(void) p;
 	uint32_t _tick = 0;
@@ -103,6 +106,24 @@ static void UartSendThread(void const *p)
 			_tick ++;
 			if(_tick % 5 == 0)
 				LED_RED_TOG();
+		}
+	}
+}
+
+static void SystemSlowFreqThread(void const *p)
+{
+	(void) p;
+	uint8_t data = 0;
+	uint32_t PreviousWakeTime = osKernelSysTick();
+	CommPackageDef *pWIfiPacket = GetWifiPacketPointer();
+	for(;;) {
+		osDelayUntil(&PreviousWakeTime, 10);
+		while(WIFI_PORT_GET_BYTE(&data) == HAL_OK) {
+			Wifi_RX_Decode(data);
+		}
+		if(GetWifiPacketUpdateState()) {
+			(void)pWIfiPacket;
+			LED_GREEN_TOG();
 		}
 	}
 }
