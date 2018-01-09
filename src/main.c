@@ -139,6 +139,7 @@ static void SystemMidFreqAThread(void const *p)
 	(void) p;
 	for(;;) {
 		if( xSemaphoreTake( xSemaphore_MidFreqA, portMAX_DELAY ) == pdTRUE ) {
+			IMU_StableCalibrationTask(SYSTEM_TIMER_TICK * 5);
 			SendDataToWaveMonitor();
 		}
 	}
