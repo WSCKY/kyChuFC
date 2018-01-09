@@ -20,22 +20,22 @@ static void DataStructChkSum(WAVEDATA_TypeDef *d)
 	d->CHKSUM = sum;
 }
 
-static IMU_RAW_DATA_Def *pIMU;
+static IMU_UnitDataDef *pIMU_Unit;
 void SendDataToWaveMonitor(void)
 {
 	if(_init_flag == 0) {
 		_init_flag = 1;
 		InitDataStruct(&WAVE_DATA.WaveData);
-		pIMU = GetIMU_RAW_DATA();
+		pIMU_Unit = GetIMU_Unit_DATA();
 	}
 
-	WAVE_DATA.WaveData.DATA[0].f = pIMU->accX;
-	WAVE_DATA.WaveData.DATA[1].f = pIMU->accY;
-	WAVE_DATA.WaveData.DATA[2].f = pIMU->accZ;
-	WAVE_DATA.WaveData.DATA[3].f = pIMU->Temp;
-	WAVE_DATA.WaveData.DATA[4].f = pIMU->gyrX;
-	WAVE_DATA.WaveData.DATA[5].f = pIMU->gyrY;
-	WAVE_DATA.WaveData.DATA[6].f = pIMU->gyrZ;
+	WAVE_DATA.WaveData.DATA[0].f = pIMU_Unit->Acc.X;
+	WAVE_DATA.WaveData.DATA[1].f = pIMU_Unit->Acc.Y;
+	WAVE_DATA.WaveData.DATA[2].f = pIMU_Unit->Acc.Z;
+	WAVE_DATA.WaveData.DATA[3].f = 0;
+	WAVE_DATA.WaveData.DATA[4].f = pIMU_Unit->Gyr.X;
+	WAVE_DATA.WaveData.DATA[5].f = pIMU_Unit->Gyr.Y;
+	WAVE_DATA.WaveData.DATA[6].f = pIMU_Unit->Gyr.Z;
 	WAVE_DATA.WaveData.DATA[7].f = 0;
 	WAVE_DATA.WaveData.DATA[8].f = 0;
 
