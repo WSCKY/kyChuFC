@@ -3,17 +3,18 @@
 
 #include "stm32f7xx.h"
 #include "BoardDefine.h"
+#include "SystemTypes.h"
 
-typedef struct {
-	int16_t accX;
-	int16_t accY;
-	int16_t accZ;
-	int16_t Temp;
-	int16_t gyrX;
-	int16_t gyrY;
-	int16_t gyrZ;
-} IMU_RAW_DATA_Def;
 /* Exported types ------------------------------------------------------------*/
+typedef struct {
+	int16_t AccX;
+	int16_t AccY;
+	int16_t AccZ;
+	int16_t Temp;
+	int16_t GyrX;
+	int16_t GyrY;
+	int16_t GyrZ;
+} SensorDataDef;
 /* Exported constants --------------------------------------------------------*/
 /* Definition for IMU_CS clock resources */
 #define IMU_SPI_CS_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOB_CLK_ENABLE()
@@ -26,7 +27,8 @@ typedef struct {
 
 HAL_StatusTypeDef IMU_ICM20602_Init(void);
 HAL_StatusTypeDef IMU_ICM20602_Read(void);
-IMU_RAW_DATA_Def *GetIMU_RAW_DATA(void);
+IMU_RawDataDef *GetIMU_RAW_DATA(void);
+IMU_UnitDataDef *GetIMU_Unit_DATA(void);
 
 #endif /* __IMU_ICM20602_H */
 
