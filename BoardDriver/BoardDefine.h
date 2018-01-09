@@ -20,7 +20,7 @@
 #define BARO_TxRxData                            SPI4_TxRxData_DMA
 #define BARO_TxRxCpltCallback                    MCU_SPI4_TxRxCpltCallback
 
-#define MOTOR_FORWARD_SPEED(a,b,c,d)             TIM2_PWM_SetPulse(a, 0, b, 0); TIM5_PWM_SetPulse(c, 0, d, 0)
-#define MOTOR_NEGATER_SPEED(a,b,c,d)             TIM2_PWM_SetPulse(0, a, 0, b); TIM5_PWM_SetPulse(0, c, 0, d)
+#define MOTOR_FORWARD_SPEED(a,b,c,d)             do {TIM2_PWM_SetPulse(a, 0, b, 0); TIM5_PWM_SetPulse(c, 0, d, 0);} while(0)
+#define MOTOR_NEGATER_SPEED(a,b,c,d)             do {TIM2_PWM_SetPulse(0, a, 0, b); TIM5_PWM_SetPulse(0, c, 0, d);} while(0)
 
 #endif /* __BOARDDEFINE_H */
