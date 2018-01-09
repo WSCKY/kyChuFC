@@ -16,7 +16,12 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 osThreadId HighThreadId, MiddThreadId, SlowThreadId;
+osThreadId SystemTimerId;
+
+static signed portBASE_TYPE xHigherPriorityTaskWoken = pdTRUE;
+xSemaphoreHandle xSemaphore_HighFreq;//, xSemaphore_MiddFreq, xSemaphore_SlowFreq;
 /* Private function prototypes -----------------------------------------------*/
+static void SystemTimerCallback(void const *p);
 static void SystemHighFreqThread(void const *p);
 static void SystemMiddFreqThread(void const *p);
 static void SystemSlowFreqThread(void const *p);
@@ -71,6 +76,10 @@ int main(void)
 
 	DEBUG_PORT_SEND("System Init!\n", 13);
 
+	vSemaphoreCreateBinary( xSemaphore_HighFreq );
+//	vSemaphoreCreateBinary( xSemaphore_MiddFreq );
+//	vSemaphoreCreateBinary( xSemaphore_SlowFreq );
+
 	osThreadDef(0, SystemHighFreqThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
 	HighThreadId = osThreadCreate(osThread(0), NULL);
 	osThreadDef(1, SystemMiddFreqThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
@@ -78,18 +87,30 @@ int main(void)
 	osThreadDef(2, SystemSlowFreqThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
 	SlowThreadId = osThreadCreate(osThread(2), NULL);
 
+	osTimerDef(SysTimer, SystemTimerCallback);
+	SystemTimerId = osTimerCreate(osTimer(SysTimer), osTimerPeriodic, (void *)0);
+	/* Start System Timer */
+	osTimerStart(SystemTimerId, 200);
+
 	osKernelStart();
 
 	for(;;);
+}
+static void SystemTimerCallback(void const *p)
+{
+	xSemaphoreGiveFromISR( xSemaphore_HighFreq, &xHigherPriorityTaskWoken );
 }
 
 static void SystemHighFreqThread(void const *p)
 {
 	(void) p;
-	uint32_t PreviousWakeTime = osKernelSysTick();
+//	uint32_t PreviousWakeTime = osKernelSysTick();
 	for(;;) {
-		osDelayUntil(&PreviousWakeTime, 100);
-		LED_BLUE_TOG();
+//		osDelayUntil(&PreviousWakeTime, 100);
+//		LED_BLUE_TOG();
+		if( xSemaphoreTake( xSemaphore_HighFreq, portMAX_DELAY ) == pdTRUE ) {
+			LED_BLUE_TOG();
+		}
 	}
 }
 
@@ -127,7 +148,11 @@ static void SystemSlowFreqThread(void const *p)
 			sig_cnt = 0;
 			LED_GREEN_TOG();
 			speed = (1696 - pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[2]) / 2;
-			MOTOR_FORWARD_SPEED(0, 0, 0, speed);
+			if(pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[6] < 1024) {
+				MOTOR_FORWARD_SPEED(speed, speed, speed, speed);
+			} else {
+				MOTOR_NEGATER_SPEED(speed, speed, speed, speed);
+			}
 		} else {
 			if(sig_cnt < 100)
 				sig_cnt ++;
