@@ -114,16 +114,26 @@ static void SystemSlowFreqThread(void const *p)
 {
 	(void) p;
 	uint8_t data = 0;
+	uint16_t speed = 0;
+	uint8_t sig_cnt = 0;
 	uint32_t PreviousWakeTime = osKernelSysTick();
-	CommPackageDef *pWIfiPacket = GetWifiPacketPointer();
+	CommPackageDef *pWifiPacket = GetWifiPacketPointer();
 	for(;;) {
 		osDelayUntil(&PreviousWakeTime, 10);
 		while(WIFI_PORT_GET_BYTE(&data) == HAL_OK) {
 			Wifi_RX_Decode(data);
 		}
 		if(GetWifiPacketUpdateState()) {
-			(void)pWIfiPacket;
+			sig_cnt = 0;
 			LED_GREEN_TOG();
+			speed = (1696 - pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[2]) / 2;
+			MOTOR_FORWARD_SPEED(0, 0, 0, speed);
+		} else {
+			if(sig_cnt < 100)
+				sig_cnt ++;
+			else {
+				MOTOR_FORWARD_SPEED(0, 0, 0, 0);
+			}
 		}
 	}
 }
