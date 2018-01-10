@@ -22,7 +22,7 @@ static _3AxisINT GyrPeaceBuf[BUF_SIZE];
 static float AccModelBuf[BUF_SIZE] = {0};
 static uint8_t PeaceDataCnt = 0, PeaceDataIndex = 0;
 static uint8_t _GryoCalibInitFlag = 0;
-static float GyroCalibData[3] = {0};
+static _3AxisFloat GyroCalibData = {0};
 
 /* Private function prototypes -----------------------------------------------*/
 static uint8_t GyrStableCheck(uint8_t millis);
@@ -61,9 +61,9 @@ static uint8_t GyrStableCheck(uint8_t millis)
 		} else {
 			if(_GryoCalibInitFlag == 0) {
 				_GryoCalibInitFlag = 1;
-				GyroCalibData[0] = oldGyroX;
-				GyroCalibData[1] = oldGyroY;
-				GyroCalibData[2] = oldGyroZ;
+				GyroCalibData.X = oldGyroX;
+				GyroCalibData.Y = oldGyroY;
+				GyroCalibData.Z = oldGyroZ;
 //				SetGyrCalibdata(GyroCalibData); //update calibration data.
 				Gravity = AccMod;
 				AccWasStabledFlag = 1;//accelerator are Stabled.
@@ -85,9 +85,9 @@ static uint8_t GyrStableCheck(uint8_t millis)
 					if(PeaceDataIndex == BUF_SIZE)
 						PeaceDataIndex = 0;
 
-					GyroCalibData[0] = GyroCalibData[0] * 0.9f + GyrPeaceBuf[PeaceDataIndex].X * 0.1f;
-					GyroCalibData[1] = GyroCalibData[1] * 0.9f + GyrPeaceBuf[PeaceDataIndex].Y * 0.1f;
-					GyroCalibData[2] = GyroCalibData[2] * 0.9f + GyrPeaceBuf[PeaceDataIndex].Z * 0.1f;
+					GyroCalibData.X = GyroCalibData.X * 0.9f + GyrPeaceBuf[PeaceDataIndex].X * 0.1f;
+					GyroCalibData.Y = GyroCalibData.Y * 0.9f + GyrPeaceBuf[PeaceDataIndex].Y * 0.1f;
+					GyroCalibData.Z = GyroCalibData.Z * 0.9f + GyrPeaceBuf[PeaceDataIndex].Z * 0.1f;
 //					SetGyrCalibdata(GyroCalibData); //update calibration data.
 					Gravity = Gravity * 0.99f + AccModelBuf[PeaceDataIndex] * 0.01f;
 //					SetGravityCalibData(&Gravity); //update calibration data.
@@ -145,5 +145,6 @@ inline uint8_t GetGyrPeaceFlag(void) { return GyrInPeaceFlag; }
 inline uint8_t GetAccStableFlag(void) { return AccInPeaceFlag; }
 inline uint8_t GyroIsCalibrated(void) { return GyrCalibratedFlag; }
 inline uint8_t AccIsStabled(void) { return AccWasStabledFlag; }
+inline _3AxisFloat *GetGyroCalibData(void) { return &GyroCalibData; }
 
 /* ------------------------ (C) COPYRIGHT kyChu ----------- END OF FILE ----- */
