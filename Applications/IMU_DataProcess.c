@@ -7,6 +7,9 @@ static _3AxisFloat *_gyro_calib;
 static IMU_RawDataDef _calib_raw = {0};
 static IMU_UnitDataDef _imu_unit = {0};
 
+static Quaternion DroneQuaternion = {1, 0, 0, 0};
+static EulerRPY DroneEulerAngle = {0};
+
 void IMU_DataPreProcessTask(uint8_t millis)
 {
 	if(_init_flag == 0) {
@@ -33,6 +36,11 @@ void IMU_DataPreProcessTask(uint8_t millis)
 		_calib_raw.GyrZ = _imu_raw->GyrZ;
 	}
 	IMU_ConvertRawToUnit(&_calib_raw, &_imu_unit);
+
+	FusionQuaternion6Axis(&_imu_unit, &DroneQuaternion, millis, 5.0f, 0.0f);
+	ConvertQuaternion2Euler(&DroneQuaternion, &DroneEulerAngle);
 }
 
-IMU_UnitDataDef *GetIMU_Unit_DATA(void) { return &_imu_unit; }
+inline IMU_UnitDataDef *GetIMU_Unit_DATA(void) { return &_imu_unit; }
+inline Quaternion *GetDroneQuaternion(void) { return &DroneQuaternion; }
+inline EulerRPY *GetDroneEulerAngle(void) { return &DroneEulerAngle; }

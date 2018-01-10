@@ -5,7 +5,10 @@
 #include "GyroStableCheck.h"
 
 void IMU_DataPreProcessTask(uint8_t millis);
+
 IMU_UnitDataDef *GetIMU_Unit_DATA(void);
+Quaternion *GetDroneQuaternion(void);
+EulerRPY *GetDroneEulerAngle(void);
 
 #endif /* __IMU_DATAPROCESS_H */
 
