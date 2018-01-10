@@ -1,5 +1,5 @@
 #ifndef __SYSTEMTYPES_H
-#define __SYStemTYPES_H
+#define __SYSTEMTYPES_H
 
 #include "stm32f7xx.h"
 
@@ -44,6 +44,10 @@ typedef struct {
 	_3AxisFloat Acc;
 	_3AxisFloat Gyr;
 } IMU_UnitDataDef;
+
+typedef struct {
+	float qw, qx, qy, qz;
+} Quaternion;
 
 typedef struct {
 	float Roll, Pitch, Yaw;
