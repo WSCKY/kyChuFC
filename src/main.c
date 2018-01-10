@@ -150,7 +150,9 @@ static void SystemMidFreqBThread(void const *p)
 	(void) p;
 	uint8_t data = 0;
 	uint16_t speed = 0;
+	uint16_t rate = 27000;
 	uint8_t sig_cnt = 0;
+	uint8_t flag = 0;
 	CommPackageDef *pWifiPacket = GetWifiPacketPointer();
 	for(;;) {
 		if( xSemaphoreTake( xSemaphore_MidFreqB, portMAX_DELAY ) == pdTRUE ) {
@@ -160,11 +162,22 @@ static void SystemMidFreqBThread(void const *p)
 			if(GetWifiPacketUpdateState()) {
 				sig_cnt = 0;
 				LED_GREEN_TOG();
-				speed = (1696 - pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[2]) / 2;
 				if(pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[6] < 1024) {
+					if(flag == 1) {
+						flag = 0;
+						MOTOR_BEEP_EXIT();
+					}
+					speed = (1696 - pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[2]) / 2;
 					MOTOR_FORWARD_SPEED(speed, speed, speed, speed);
 				} else {
-					MOTOR_NEGATER_SPEED(speed, speed, speed, speed);
+					if(flag == 0) {
+						flag = 1;
+						MOTOR_BEEP_INIT();
+					}
+					rate = 13500 + 1120 - pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[3] * 5;
+					speed = (1696 - pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[2]) / 4;
+					MOTOR_BEEP_FREQ(rate);
+					MOTOR_BEEP_VOLUME(speed);
 				}
 			} else {
 				if(sig_cnt < 100)
