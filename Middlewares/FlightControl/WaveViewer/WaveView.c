@@ -32,12 +32,12 @@ void SendDataToWaveMonitor(void)
 	WAVE_DATA.WaveData.DATA[0].f = pIMU_Unit->Acc.X;
 	WAVE_DATA.WaveData.DATA[1].f = pIMU_Unit->Acc.Y;
 	WAVE_DATA.WaveData.DATA[2].f = pIMU_Unit->Acc.Z;
-	WAVE_DATA.WaveData.DATA[3].f = 0;
+	WAVE_DATA.WaveData.DATA[3].f = TIM5->CNT;
 	WAVE_DATA.WaveData.DATA[4].f = pIMU_Unit->Gyr.X;
 	WAVE_DATA.WaveData.DATA[5].f = pIMU_Unit->Gyr.Y;
 	WAVE_DATA.WaveData.DATA[6].f = pIMU_Unit->Gyr.Z;
-	WAVE_DATA.WaveData.DATA[7].f = 0;
-	WAVE_DATA.WaveData.DATA[8].f = 0;
+	WAVE_DATA.WaveData.DATA[7].f = TIM5->ARR;
+	WAVE_DATA.WaveData.DATA[8].f = TIM5->PSC;
 
 	DataStructChkSum(&WAVE_DATA.WaveData);
 
