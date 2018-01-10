@@ -129,7 +129,7 @@ static void SystemHighFreqThread(void const *p)
 	(void) p;
 	for(;;) {
 		if( xSemaphoreTake( xSemaphore_HighFreq, portMAX_DELAY ) == pdTRUE ) {
-			IMU_ICM20602_Read();
+			IMU_DataPreProcessTask(SYSTEM_TIMER_TICK);
 		}
 	}
 }
