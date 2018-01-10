@@ -2,7 +2,6 @@
 
 static uint16_t _sensor_id = 0xFFFF;
 static IMU_RawDataDef _imu_raw = {0};
-static IMU_UnitDataDef _imu_unit = {0};
 static int16_t _sensor_temp = 0;
 
 static uint8_t _tx_rx_comp = 0;
@@ -46,19 +45,21 @@ HAL_StatusTypeDef IMU_ICM20602_Read(void)
 		((int8_t *)&_imu_raw.GyrY)[1] = _rx_buffer[11];
 		((int8_t *)&_imu_raw.GyrZ)[0] = _rx_buffer[14];
 		((int8_t *)&_imu_raw.GyrZ)[1] = _rx_buffer[13];
-
-		_imu_unit.Acc.X = _imu_raw.AccX * 0.002392578125f;
-		_imu_unit.Acc.Y = _imu_raw.AccY * 0.002392578125f;
-		_imu_unit.Acc.Z = _imu_raw.AccZ * 0.002392578125f;
-		_imu_unit.Gyr.X = _imu_raw.GyrX * 0.06103515625f;
-		_imu_unit.Gyr.Y = _imu_raw.GyrY * 0.06103515625f;
-		_imu_unit.Gyr.Z = _imu_raw.GyrZ * 0.06103515625f;
 //	}
 	return ret;
 }
 
+void IMU_ConvertRawToUnit(IMU_RawDataDef *pRaw, IMU_UnitDataDef *pUnit)
+{
+	pUnit->Acc.X = pRaw->AccX * 0.002392578125f;
+	pUnit->Acc.Y = pRaw->AccY * 0.002392578125f;
+	pUnit->Acc.Z = pRaw->AccZ * 0.002392578125f;
+	pUnit->Gyr.X = pRaw->GyrX * 0.06103515625f;
+	pUnit->Gyr.Y = pRaw->GyrY * 0.06103515625f;
+	pUnit->Gyr.Z = pRaw->GyrZ * 0.06103515625f;
+}
+
 IMU_RawDataDef *GetIMU_RAW_DATA(void) { return &_imu_raw; }
-IMU_UnitDataDef *GetIMU_Unit_DATA(void) { return &_imu_unit; }
 
 static HAL_StatusTypeDef _IMU_Configure(void)
 {

@@ -28,7 +28,7 @@ typedef struct {
 HAL_StatusTypeDef IMU_ICM20602_Init(void);
 HAL_StatusTypeDef IMU_ICM20602_Read(void);
 IMU_RawDataDef *GetIMU_RAW_DATA(void);
-IMU_UnitDataDef *GetIMU_Unit_DATA(void);
+void IMU_ConvertRawToUnit(IMU_RawDataDef *pRaw, IMU_UnitDataDef *pUnit);
 
 #endif /* __IMU_ICM20602_H */
 
