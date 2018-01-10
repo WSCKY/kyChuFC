@@ -57,6 +57,7 @@ HAL_StatusTypeDef MCU_TIMs_Init(void)
 }
 
 #if (TIM2_ENABLE)
+void TIM2_SetPeriod(uint32_t Period) { TIM2->ARR = Period; }
 #if (TIM2_PWM_OUTPUT_ENABLE)
 /*
  * @brief  set TIM2 CCR Value.
@@ -78,9 +79,20 @@ void TIM2_PWM_SetPulse(uint16_t CCR1, uint16_t CCR2, uint16_t CCR3, uint16_t CCR
 	TIM2->CCR4 = CCR4;
 #endif /* TIM2_PWM_CHANNEL4_ENABLE */
 }
+
+/* set TIM2 PWM Output Polarity. */
+void TIM2_PWM_SetPolarity(uint32_t PolarityChannel, PWM_PolarityState Polarity)
+{
+	if(Polarity == PolarityHigh) {
+		TIM2->CCER &= ~PolarityChannel;
+	} else if(Polarity == PolarityLow) {
+		TIM2->CCER |= PolarityChannel;
+	}
+}
 #endif /* TIM2_PWM_OUTPUT_ENABLE */
 #endif /* TIM2_ENABLE */
 #if (TIM5_ENABLE)
+void TIM5_SetPeriod(uint32_t Period) { TIM5->ARR = Period; }
 #if (TIM5_PWM_OUTPUT_ENABLE)
 /*
  * @brief  set TIM5 CCR Value.
@@ -101,6 +113,16 @@ void TIM5_PWM_SetPulse(uint16_t CCR1, uint16_t CCR2, uint16_t CCR3, uint16_t CCR
 #if(TIM5_PWM_CHANNEL4_ENABLE)
 	TIM5->CCR4 = CCR4;
 #endif /* TIM5_PWM_CHANNEL4_ENABLE */
+}
+
+/* set TIM5 PWM Output Polarity. */
+void TIM5_PWM_SetPolarity(uint32_t PolarityChannel, PWM_PolarityState Polarity)
+{
+	if(Polarity == PolarityHigh) {
+		TIM5->CCER &= ~PolarityChannel;
+	} else if(Polarity == PolarityLow) {
+		TIM5->CCER |= PolarityChannel;
+	}
 }
 #endif /* TIM5_PWM_OUTPUT_ENABLE */
 #endif /* TIM5_ENABLE */
@@ -161,9 +183,13 @@ static HAL_StatusTypeDef TIM2_PeriphInit(void)
 	Tim2Handle.Init.Prescaler         = uhPrescalerValue;
 	Tim2Handle.Init.Period            = (TIM2_COUNT_CLOCK_RATE / TIM2_OUTPUT_CLOCK_RATE) - 1;
 	Tim2Handle.Init.ClockDivision     = 0;
-	Tim2Handle.Init.CounterMode       = TIM_COUNTERMODE_UP;
+	Tim2Handle.Init.CounterMode       = TIM2_COUNTERMODE;
 	Tim2Handle.Init.RepetitionCounter = 0;
+#if (TIM2_AUTORELOAD_PRELOAD)
+	Tim2Handle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+#else
 	Tim2Handle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+#endif
 	if ((ret = HAL_TIM_PWM_Init(&Tim2Handle)) != HAL_OK) return ret; /* Initialization Error */
 #if (TIM2_PWM_OUTPUT_ENABLE & (TIM2_PWM_CHANNEL1_ENABLE | TIM2_PWM_CHANNEL2_ENABLE | TIM2_PWM_CHANNEL3_ENABLE | TIM2_PWM_CHANNEL4_ENABLE))
 	/*##-2- Configure the PWM channels #########################################*/
@@ -264,9 +290,13 @@ static HAL_StatusTypeDef TIM5_PeriphInit(void)
 	Tim5Handle.Init.Prescaler         = uhPrescalerValue;
 	Tim5Handle.Init.Period            = (TIM5_COUNT_CLOCK_RATE / TIM5_OUTPUT_CLOCK_RATE) - 1;
 	Tim5Handle.Init.ClockDivision     = 0;
-	Tim5Handle.Init.CounterMode       = TIM_COUNTERMODE_UP;
+	Tim5Handle.Init.CounterMode       = TIM5_COUNTERMODE;
 	Tim5Handle.Init.RepetitionCounter = 0;
+#if (TIM5_AUTORELOAD_PRELOAD)
+	Tim5Handle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+#else
 	Tim5Handle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+#endif
 	if ((ret = HAL_TIM_PWM_Init(&Tim5Handle)) != HAL_OK) return ret; /* Initialization Error */
 #if (TIM5_PWM_OUTPUT_ENABLE & (TIM5_PWM_CHANNEL1_ENABLE | TIM5_PWM_CHANNEL2_ENABLE | TIM5_PWM_CHANNEL3_ENABLE | TIM5_PWM_CHANNEL4_ENABLE))
 	/*##-2- Configure the PWM channels #########################################*/

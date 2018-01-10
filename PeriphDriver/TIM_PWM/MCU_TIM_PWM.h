@@ -17,6 +17,15 @@
 #include "../PeriphDefine.h"
 
 /* Exported types ------------------------------------------------------------*/
+#define TIM_POLARITY_CHANNEL_1                   (0x0002)
+#define TIM_POLARITY_CHANNEL_2                   (0x0020)
+#define TIM_POLARITY_CHANNEL_3                   (0x0200)
+#define TIM_POLARITY_CHANNEL_4                   (0x2000)
+
+typedef enum {
+	PolarityHigh = 0,
+	PolarityLow = 1
+} PWM_PolarityState;
 /* Exported variables --------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported definitions ------------------------------------------------------*/
@@ -42,6 +51,10 @@
   /* Definition for TIM2 peripheral configuration */
   #define TIM2_COUNT_CLOCK_RATE                  (27000000)
   #define TIM2_OUTPUT_CLOCK_RATE                 (27000)
+  #define TIM2_PERIOD_SET_DEFAULT()              (TIM2->ARR = (TIM2_COUNT_CLOCK_RATE / TIM2_OUTPUT_CLOCK_RATE) - 1)
+
+  #define TIM2_COUNTERMODE                       TIM_COUNTERMODE_CENTERALIGNED3
+  #define TIM2_AUTORELOAD_PRELOAD                (1)
   /* Definition for TIM2 clock resources */
   #define TIM2_CLK_ENABLE()                      __TIM2_CLK_ENABLE()
 #if (TIM2_PWM_OUTPUT_ENABLE)
@@ -78,6 +91,10 @@
   /* Definition for TIM5 peripheral configuration */
   #define TIM5_COUNT_CLOCK_RATE                  (27000000)
   #define TIM5_OUTPUT_CLOCK_RATE                 (27000)
+  #define TIM5_PERIOD_SET_DEFAULT()              (TIM5->ARR = (TIM5_COUNT_CLOCK_RATE / TIM5_OUTPUT_CLOCK_RATE) - 1)
+
+  #define TIM5_COUNTERMODE                       TIM_COUNTERMODE_CENTERALIGNED3
+  #define TIM5_AUTORELOAD_PRELOAD                (1)
   /* Definition for TIM5 clock resources */
   #define TIM5_CLK_ENABLE()                      __TIM5_CLK_ENABLE()
 #if (TIM5_PWM_OUTPUT_ENABLE)
@@ -113,13 +130,17 @@
 /* Exported functions ------------------------------------------------------- */
 HAL_StatusTypeDef MCU_TIMs_Init(void);
 #if (TIM2_ENABLE)
+void TIM2_SetPeriod(uint32_t Period);
 #if (TIM2_PWM_OUTPUT_ENABLE)
+  void TIM2_PWM_SetPolarity(uint32_t PolarityChannel, PWM_PolarityState Polarity);
   void TIM2_PWM_SetPulse(uint16_t CCR1, uint16_t CCR2, uint16_t CCR3, uint16_t CCR4);
 #endif /* TIM2_PWM_OUTPUT_ENABLE */
 #endif /* TIM2_ENABLE */
 
 #if (TIM5_ENABLE)
+  void TIM5_SetPeriod(uint32_t Period);
 #if (TIM5_PWM_OUTPUT_ENABLE)
+  void TIM5_PWM_SetPolarity(uint32_t PolarityChannel, PWM_PolarityState Polarity);
   void TIM5_PWM_SetPulse(uint16_t CCR1, uint16_t CCR2, uint16_t CCR3, uint16_t CCR4);
 #endif /* TIM5_PWM_OUTPUT_ENABLE */
 #endif /* TIM5_ENABLE */
