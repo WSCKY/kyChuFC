@@ -20,11 +20,15 @@
 #include "WaveView.h"
 #include "BoardLed.h"
 #include "BoardPower.h"
-#include "WifiCP.h"
 
 #include "MCU_Periph.h"
 
+#include "MotorControl.h"
+#include "FlyStateManage.h"
+#include "RF_DataProcess.h"
 #include "GyroStableCheck.h"
+#include "IMU_DataProcess.h"
+
 
 /* Macros --------------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
