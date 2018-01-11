@@ -54,6 +54,10 @@ typedef struct {
 } EulerRPY;
 
 typedef struct {
+	float kp, ki, kd, preErr, Pout, Iout, Dout, Output, Imax, Isum, dt;
+} PID;
+
+typedef struct {
 	uint16_t Freq;
 	uint8_t Volume;
 	uint16_t Time;
