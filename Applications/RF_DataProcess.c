@@ -1,5 +1,5 @@
 #include "RF_DataProcess.h"
-
+#include "MotorControl.h"
 static uint8_t _init_flag = 0;
 
 static CommPackageDef *pWifiPacket;
@@ -28,7 +28,7 @@ void RF_DataProcessTask(uint8_t millis)
 
 		_rf_command.Roll = LinearMap(pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[0], RF_CHANNEL_RAW_MIN, RF_CHANNEL_RAW_MAX, RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX);
 		_rf_command.Pitch = LinearMap(pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[1], RF_CHANNEL_RAW_MIN, RF_CHANNEL_RAW_MAX, RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX);
-		_rf_command.Throttle = RF_COMMAND_UNIT_MID << 1 - LinearMap(pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[2], RF_CHANNEL_RAW_MIN, RF_CHANNEL_RAW_MAX, RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX);
+		_rf_command.Throttle = (RF_COMMAND_UNIT_MID << 1) - LinearMap(pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[2], RF_CHANNEL_RAW_MIN, RF_CHANNEL_RAW_MAX, RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX);
 		_rf_command.Yaw = LinearMap(pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[3], RF_CHANNEL_RAW_MIN, RF_CHANNEL_RAW_MAX, RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX);
 		_rf_command.Mode = (pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[6] < RF_CHANNEL_RAW_MIN + RF_CHANNEL_RAW_DEADBAND) ? \
 		    FlightMode1 : ((pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[6] > RF_CHANNEL_RAW_MAX - RF_CHANNEL_RAW_DEADBAND) ? \

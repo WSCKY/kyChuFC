@@ -1,6 +1,8 @@
 #ifndef __RF_DATAPROCESS_H
 #define __RF_DATAPROCESS_H
 
+#include "Maths.h"
+
 #include "WifiCP.h"
 #include "BoardDefine.h"
 
@@ -45,6 +47,8 @@ typedef struct {
 	TriState CmdSwitch;
 	uint16_t RevChannel[5];
 } RF_COMMAND_DEF;
+
+void RF_DataProcessTask(uint8_t millis);
 
 uint8_t RfSignalIsLost(void);
 RF_COMMAND_DEF *GetRFCommand(void);
