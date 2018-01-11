@@ -53,6 +53,19 @@ typedef struct {
 	float Roll, Pitch, Yaw;
 } EulerRPY;
 
+typedef struct {
+	uint16_t Freq;
+	uint8_t Volume;
+	uint16_t Time;
+	uint16_t Delay;
+	uint16_t Times;
+} ToneDataDef;
+
+typedef struct {
+	const ToneDataDef *pTone;
+	uint8_t NumTones;
+} ToneBuffDef;
+
 #endif /* __SYSTEMTYPES */
 
 /* ------------------------ (C) COPYRIGHT kyChu ----------- END OF FILE ----- */
