@@ -14,6 +14,10 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 #define SYSTEM_TIMER_TICK                        (2)
+#define HIGH_FREQ_TASK_DIV_FACTOR                (1)
+#define MIDA_FREQ_TASK_DIV_FACTOR                (5)
+#define MIDB_FREQ_TASK_DIV_FACTOR                (5)
+#define SLOW_FREQ_TASK_DIV_FACTOR                (10)
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 osThreadId HighThreadId, MidThreadAId, MidThreadBId, SlowThreadId, MiniThreadId;
@@ -101,6 +105,7 @@ int main(void)
 	osTimerStart(SystemTimerId, SYSTEM_TIMER_TICK);
 
 	DEBUG_PORT_SEND("System Init!\n", 13);
+	SendMotorBeepRequest(Audio_PowerOn);
 
 	osKernelStart();
 
@@ -111,13 +116,13 @@ static void SystemTimerCallback(void const *p)
 {
 	SysTimerCnt ++;
 	xSemaphoreGiveFromISR( xSemaphore_HighFreq, &xHigherPriorityTaskWoken );
-	if(SysTimerCnt % 5 == 1) {
+	if(SysTimerCnt % MIDA_FREQ_TASK_DIV_FACTOR == 1) {
 		xSemaphoreGiveFromISR( xSemaphore_MidFreqA, &xHigherPriorityTaskWoken );
 	}
-	if(SysTimerCnt % 5 == 2) {
+	if(SysTimerCnt % MIDB_FREQ_TASK_DIV_FACTOR == 2) {
 		xSemaphoreGiveFromISR( xSemaphore_MidFreqB, &xHigherPriorityTaskWoken );
 	}
-	if(SysTimerCnt % 10 == 3) {
+	if(SysTimerCnt % SLOW_FREQ_TASK_DIV_FACTOR == 3) {
 		xSemaphoreGiveFromISR( xSemaphore_SlowFreq, &xHigherPriorityTaskWoken );
 	}
 
@@ -127,9 +132,11 @@ static void SystemTimerCallback(void const *p)
 static void SystemHighFreqThread(void const *p)
 {
 	(void) p;
+	uint8_t TaskT = SYSTEM_TIMER_TICK * HIGH_FREQ_TASK_DIV_FACTOR;
 	for(;;) {
 		if( xSemaphoreTake( xSemaphore_HighFreq, portMAX_DELAY ) == pdTRUE ) {
-			IMU_DataPreProcessTask(SYSTEM_TIMER_TICK);
+			IMU_DataPreProcessTask(TaskT);
+			MotorControlTask(TaskT);
 		}
 	}
 }
@@ -137,10 +144,11 @@ static void SystemHighFreqThread(void const *p)
 static void SystemMidFreqAThread(void const *p)
 {
 	(void) p;
+	uint8_t TaskT = SYSTEM_TIMER_TICK * MIDA_FREQ_TASK_DIV_FACTOR;
 	for(;;) {
 		if( xSemaphoreTake( xSemaphore_MidFreqA, portMAX_DELAY ) == pdTRUE ) {
-			IMU_StableCalibrationTask(SYSTEM_TIMER_TICK * 5);
-			SendDataToWaveMonitor();
+			RF_DataProcessTask(TaskT);
+			FlyStateManageTask(TaskT);
 		}
 	}
 }
@@ -148,44 +156,11 @@ static void SystemMidFreqAThread(void const *p)
 static void SystemMidFreqBThread(void const *p)
 {
 	(void) p;
-	uint8_t data = 0;
-	uint16_t speed = 0;
-	uint16_t rate = 27000;
-	uint8_t sig_cnt = 0;
-	uint8_t flag = 0;
-	CommPackageDef *pWifiPacket = GetWifiPacketPointer();
+	uint8_t TaskT = SYSTEM_TIMER_TICK * MIDB_FREQ_TASK_DIV_FACTOR;
 	for(;;) {
 		if( xSemaphoreTake( xSemaphore_MidFreqB, portMAX_DELAY ) == pdTRUE ) {
-			while(WIFI_PORT_GET_BYTE(&data) == HAL_OK) {
-				Wifi_RX_Decode(data);
-			}
-			if(GetWifiPacketUpdateState()) {
-				sig_cnt = 0;
-				LED_GREEN_TOG();
-				if(pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[6] < 1024) {
-					if(flag == 1) {
-						flag = 0;
-						MOTOR_BEEP_EXIT();
-					}
-					speed = (1696 - pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[2]) / 2;
-					MOTOR_FORWARD_SPEED(speed, speed, speed, speed);
-				} else {
-					if(flag == 0) {
-						flag = 1;
-						MOTOR_BEEP_INIT();
-					}
-					rate = 13500 + 1120 - pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[3] * 5;
-					speed = (1696 - pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[2]) / 4;
-					MOTOR_BEEP_FREQ(rate);
-					MOTOR_BEEP_VOLUME(speed);
-				}
-			} else {
-				if(sig_cnt < 100)
-					sig_cnt ++;
-				else {
-					MOTOR_FORWARD_SPEED(0, 0, 0, 0);
-				}
-			}
+			IMU_StableCalibrationTask(TaskT);
+			SendDataToWaveMonitor();
 		}
 	}
 }
@@ -206,7 +181,11 @@ static void SystemMiniFreqThread(void const *p)
 	uint32_t PreviousWakeTime = osKernelSysTick();
 	for(;;) {
 		osDelayUntil(&PreviousWakeTime, 200);
-		LED_BLUE_TOG();
+		if(RfSignalIsLost()) {
+			LED_BLUE_TOG();
+		} else {
+			LED_GREEN_TOG();
+		}
 	}
 }
 
