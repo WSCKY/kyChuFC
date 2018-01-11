@@ -46,17 +46,15 @@ void FlyStateManageTask(uint8_t millis)
 	if(pRF_CMD->TrigSwitch == DualState_Low) {
 		if(FlyEnableTogCmdCnt == 2) {
 			FlyEnableTogCmdCnt = 0;
-
 			if(FlyEnableFlag == Disabled) {
 				if(FlyEnableLock == UnLock) {
 					if(FlyEnableCheck()) {
-//						FlyEnableFlag = Enabled;
+						FlyEnableFlag = Enabled;
 					}
 				}
 			} else {
 				FlyEnableFlag = Disabled;
 			}
-			SendMotorBeepRequest(Audio_PowerOn);
 		} else {
 			FlyEnableTogCmdCnt = 1;
 		}
