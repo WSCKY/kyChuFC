@@ -99,4 +99,9 @@ void ConvertQuaternion2Euler(Quaternion* Q, EulerRPY* eur)
 	eur->Yaw     = atan2f(2 * (qw * qz + qx * qy) , 1 - 2 * (qy * qy + qz * qz))*RAD2DEG;  //+-180
 }
 
+float LinearMap(float in, float in_min, float in_max, float tar_min, float tar_max)
+{
+	return ((((tar_max - tar_min) * (in - in_min)) / (in_max - in_min)) + tar_min);
+}
+
 /* ------------------------ (C) COPYRIGHT kyChu ----------- END OF FILE ----- */

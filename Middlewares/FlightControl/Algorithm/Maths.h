@@ -20,6 +20,8 @@
 void FusionQuaternion6Axis(IMU_UnitDataDef *pIMU, Quaternion *Q, uint8_t millis, float kp, float ki);
 void ConvertQuaternion2Euler(Quaternion* Q, EulerRPY* eur);
 
+float LinearMap(float in, float in_min, float in_max, float tar_min, float tar_max);
+
 #endif /* __MATHS_H */
 
 /* ------------------------ (C) COPYRIGHT kyChu ----------- END OF FILE ----- */
