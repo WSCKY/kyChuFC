@@ -1,5 +1,5 @@
 #include "RF_DataProcess.h"
-#include "MotorControl.h"
+
 static uint8_t _init_flag = 0;
 
 static CommPackageDef *pWifiPacket;
