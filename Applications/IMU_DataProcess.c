@@ -12,6 +12,7 @@ static EulerRPY DroneEulerAngle = {0};
 
 void IMU_DataPreProcessTask(uint8_t millis)
 {
+	float kp = 5.0f;
 	if(_init_flag == 0) {
 		_init_flag = 1;
 
@@ -37,7 +38,9 @@ void IMU_DataPreProcessTask(uint8_t millis)
 	}
 	IMU_ConvertRawToUnit(&_calib_raw, &_imu_unit);
 
-	FusionQuaternion6Axis(&_imu_unit, &DroneQuaternion, millis, 5.0f, 0.0f);
+	if(GetFlyEnableState() == Enabled) kp = 0.5f;
+	else kp = 5.0f;
+	FusionQuaternion6Axis(&_imu_unit, &DroneQuaternion, millis, kp, 0.0f);
 	ConvertQuaternion2Euler(&DroneQuaternion, &DroneEulerAngle);
 }
 

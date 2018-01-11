@@ -2,6 +2,7 @@
 #define __IMU_DATAPROCESS_H
 
 #include "IMU_ICM20602.h"
+#include "FlyStateManage.h"
 #include "GyroStableCheck.h"
 
 void IMU_DataPreProcessTask(uint8_t millis);
