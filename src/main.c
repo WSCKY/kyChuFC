@@ -136,6 +136,7 @@ static void SystemHighFreqThread(void const *p)
 	for(;;) {
 		if( xSemaphoreTake( xSemaphore_HighFreq, portMAX_DELAY ) == pdTRUE ) {
 			IMU_DataPreProcessTask(TaskT);
+			InnerLoopCtrlTask(TaskT);
 			MotorControlTask(TaskT);
 		}
 	}
@@ -149,6 +150,7 @@ static void SystemMidFreqAThread(void const *p)
 		if( xSemaphoreTake( xSemaphore_MidFreqA, portMAX_DELAY ) == pdTRUE ) {
 			RF_DataProcessTask(TaskT);
 			FlyStateManageTask(TaskT);
+			AngleCtrlModeTask(TaskT);
 		}
 	}
 }
