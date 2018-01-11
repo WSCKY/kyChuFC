@@ -104,4 +104,23 @@ float LinearMap(float in, float in_min, float in_max, float tar_min, float tar_m
 	return ((((tar_max - tar_min) * (in - in_min)) / (in_max - in_min)) + tar_min);
 }
 
+void PID_LOOP(PID *pid, float exp, float measure)
+{
+	float err, diff;
+	err = exp - measure;
+
+	diff = (err - pid->preErr) / pid->dt;
+	pid->preErr = err;
+
+	pid->Isum += err * pid->dt;
+	if(pid->Isum > pid->Imax) pid->Isum = pid->Imax;
+	if(pid->Isum < -pid->Imax) pid->Isum = -pid->Imax;
+
+	pid->Pout = pid->kp * err;
+	pid->Iout = pid->ki * pid->Isum;
+	pid->Dout = pid->kd * diff;
+
+	pid->Output = pid->Pout + pid->Iout + pid->Dout;
+}
+
 /* ------------------------ (C) COPYRIGHT kyChu ----------- END OF FILE ----- */
