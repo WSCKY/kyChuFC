@@ -64,7 +64,7 @@ void DMA2_Stream0_IRQHandler(void)
 {
 #if (SPI4_ENABLE)
 #if (SPI4_RX_DMA_ENABLE)
-  void SPI4_DMA_RX_IRQHandler(void);
+  SPI4_DMA_RX_IRQHandler();
 #endif /* SPI4_RX_DMA_ENABLE */
 #endif /* SPI4_ENABLE */
 }
@@ -73,7 +73,16 @@ void DMA2_Stream1_IRQHandler(void)
 {
 #if (SPI4_ENABLE)
 #if (SPI4_TX_DMA_ENABLE)
-  void SPI4_DMA_TX_IRQHandler(void);
+  SPI4_DMA_TX_IRQHandler();
 #endif /* SPI4_TX_DMA_ENABLE */
 #endif /* SPI4_ENABLE */
+}
+
+void DMA2_Stream4_IRQHandler(void)
+{
+#if (ADC1_ENABLE)
+#if (ADC1_DMA_IRQ_ENABLE)
+	ADC1_DMA_IRQHandler();
+#endif /* ADC1_DMA_IRQ_ENABLE */
+#endif /* ADC1_ENABLE */
 }
