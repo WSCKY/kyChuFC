@@ -67,6 +67,9 @@ int main(void)
 	PWR_ON();
 
 	BoardLedInit();
+	if(MCU_TIMs_Init() != HAL_OK) {
+		while(1);
+	}
 	if(MCU_SPIs_Init() != HAL_OK) {
 		while(1);
 	}
@@ -76,10 +79,10 @@ int main(void)
 	if(MCU_USARTs_Init() != HAL_OK) {
 		while(1);
 	}
-	if(MCU_TIMs_Init() != HAL_OK) {
+	if(IMU_ICM20602_Init() != HAL_OK) {
 		while(1);
 	}
-	if(IMU_ICM20602_Init() != HAL_OK) {
+	if(MCU_ADCs_Init() != HAL_OK) {
 		while(1);
 	}
 
