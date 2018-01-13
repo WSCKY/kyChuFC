@@ -18,8 +18,6 @@
 #include "cmsis_os.h"
 
 #include "WaveView.h"
-#include "BoardLed.h"
-#include "BoardPower.h"
 
 #include "MCU_Periph.h"
 
@@ -30,6 +28,7 @@
 #include "GyroStableCheck.h"
 #include "IMU_DataProcess.h"
 #include "InnerControlLoop.h"
+#include "SystemPowerManage.h"
 
 /* Macros --------------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/

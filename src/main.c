@@ -63,10 +63,8 @@ int main(void)
 	/* Configure the system clock to 216 MHz */
 	SystemClock_Config();
 
-	PowerControlInit();
-	PWR_ON();
-
-	BoardLedInit();
+	MCU_GPIOs_Init();
+	SYSTEM_POWER_ON();
 	if(MCU_TIMs_Init() != HAL_OK) {
 		while(1);
 	}
@@ -165,6 +163,8 @@ static void SystemMidFreqBThread(void const *p)
 	for(;;) {
 		if( xSemaphoreTake( xSemaphore_MidFreqB, portMAX_DELAY ) == pdTRUE ) {
 			IMU_StableCalibrationTask(TaskT);
+			BatteryVoltageCheckTask(TaskT);
+			DroneAutoPowerOffTask(TaskT);
 			SendDataToWaveMonitor();
 		}
 	}
@@ -173,6 +173,7 @@ static void SystemMidFreqBThread(void const *p)
 static void SystemSlowFreqThread(void const *p)
 {
 	(void) p;
+//	uint8_t TaskT = SYSTEM_TIMER_TICK * SLOW_FREQ_TASK_DIV_FACTOR;
 	for(;;) {
 		if( xSemaphoreTake( xSemaphore_SlowFreq, portMAX_DELAY ) == pdTRUE ) {
 			// ...
