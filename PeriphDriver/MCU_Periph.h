@@ -3,6 +3,7 @@
 
 #include "MCU_ADC.h"
 #include "MCU_SPI.h"
+#include "MCU_GPIO.h"
 #include "MCU_UART.h"
 #include "MCU_USART.h"
 #include "MCU_TIM_PWM.h"
