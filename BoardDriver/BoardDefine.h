@@ -3,6 +3,28 @@
 
 #include "MCU_Periph.h"
 
+/* Power Control Linker */
+#define SYSTEM_POWER_ON()                        MCU_GPIO_SetLevelHigh(1)
+#define SYSTEM_POWER_OFF()                       MCU_GPIO_SetLevelLow(1)
+
+#define SYSTEM_ENTER_STOP_MODE()                 HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI)
+
+/* Power Key Linker */
+#define SYSTEM_POWER_KEY_STATE()                 MCU_GPIO_ReadLevel(0)
+
+/* Board LED Linker */
+#define LED_RED_ON()                             MCU_GPIO_SetLevelHigh(5)
+#define LED_RED_OFF()                            MCU_GPIO_SetLevelLow(5)
+#define LED_RED_TOG()                            MCU_GPIO_SetLevelToggle(5)
+
+#define LED_BLUE_ON()                            MCU_GPIO_SetLevelHigh(4)
+#define LED_BLUE_OFF()                           MCU_GPIO_SetLevelLow(4)
+#define LED_BLUE_TOG()                           MCU_GPIO_SetLevelToggle(4)
+
+#define LED_GREEN_ON()                           MCU_GPIO_SetLevelHigh(3)
+#define LED_GREEN_OFF()                          MCU_GPIO_SetLevelLow(3)
+#define LED_GREEN_TOG()                          MCU_GPIO_SetLevelToggle(3)
+
 /* Debug Port Linker */
 #define DEBUG_PORT_SEND                          Uart7SendBuffer_DMA
 
@@ -39,5 +61,8 @@
 	                                                 TIM5_PWM_SetPulse(TIM5->ARR - (v), (v), TIM5->ARR - (v), (v));} while(0)
 #define MOTOR_BEEP_FREQ(f)                       do {TIM2->ARR = (TIM2_COUNT_CLOCK_RATE / ((f) << 1)) - 1; \
 	                                                 TIM5->ARR = (TIM5_COUNT_CLOCK_RATE / ((f) << 1)) - 1;} while(0)
+
+/* Battery Voltage Measure Linker */
+#define BATTERY_VOLT_RAW_VAL                     (*GetADC1ConvertedValue())
 
 #endif /* __BOARDDEFINE_H */
