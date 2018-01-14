@@ -22,6 +22,7 @@
 
 void FusionQuaternion6Axis(IMU_UnitDataDef *pIMU, Quaternion *Q, uint8_t millis, float kp, float ki);
 void ConvertQuaternion2Euler(Quaternion* Q, EulerRPY* eur);
+void QuaternionMultiplicationCross(Quaternion* Q_Start, Quaternion* Q_Rotate, Quaternion* Q_Terminal);
 void PID_LOOP(PID *pid, float exp, float measure);
 
 float LinearMap(float in, float in_min, float in_max, float tar_min, float tar_max);

@@ -99,6 +99,27 @@ void ConvertQuaternion2Euler(Quaternion* Q, EulerRPY* eur)
 	eur->Yaw     = atan2f(2 * (qw * qz + qx * qy) , 1 - 2 * (qy * qy + qz * qz))*RAD2DEG;  //+-180
 }
 
+void QuaternionMultiplicationCross(Quaternion* Q_Start, Quaternion* Q_Rotate, Quaternion* Q_Terminal)
+{
+	float recipNorm;
+	Quaternion Q_Start_c =  *Q_Start;
+	Quaternion Q_Rotate_c = *Q_Rotate;
+
+	Quaternion Q_Result;
+	Q_Result.qw = Q_Start_c.qw*Q_Rotate_c.qw - Q_Start_c.qx*Q_Rotate_c.qx - Q_Start_c.qy*Q_Rotate_c.qy - Q_Start_c.qz*Q_Rotate_c.qz;
+	Q_Result.qx = Q_Start_c.qw*Q_Rotate_c.qx + Q_Start_c.qx*Q_Rotate_c.qw + Q_Start_c.qz*Q_Rotate_c.qy - Q_Start_c.qy*Q_Rotate_c.qz;
+	Q_Result.qy = Q_Start_c.qw*Q_Rotate_c.qy + Q_Start_c.qy*Q_Rotate_c.qw + Q_Start_c.qx*Q_Rotate_c.qz - Q_Start_c.qz*Q_Rotate_c.qx;
+	Q_Result.qz = Q_Start_c.qw*Q_Rotate_c.qz + Q_Start_c.qz*Q_Rotate_c.qw + Q_Start_c.qy*Q_Rotate_c.qx - Q_Start_c.qx*Q_Rotate_c.qy;
+
+	recipNorm = 1.0f/sqrtf(Q_Result.qw * Q_Result.qw + Q_Result.qx * Q_Result.qx + Q_Result.qy * Q_Result.qy + Q_Result.qz * Q_Result.qz);
+	Q_Result.qw *= recipNorm;
+	Q_Result.qx *= recipNorm;
+	Q_Result.qy *= recipNorm;
+	Q_Result.qz *= recipNorm;
+
+	*Q_Terminal =  Q_Result;
+}
+
 float LinearMap(float in, float in_min, float in_max, float tar_min, float tar_max)
 {
 	return ((((tar_max - tar_min) * (in - in_min)) / (in_max - in_min)) + tar_min);
