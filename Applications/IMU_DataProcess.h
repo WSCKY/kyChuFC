@@ -11,5 +11,8 @@ IMU_UnitDataDef *GetIMU_Unit_DATA(void);
 Quaternion *GetDroneQuaternion(void);
 EulerRPY *GetDroneEulerAngle(void);
 
+Quaternion *GetDroneFilpQuatnion(void);
+EulerRPY *GetDroneFilpEulerAngle(void);
+
 #endif /* __IMU_DATAPROCESS_H */
 

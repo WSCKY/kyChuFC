@@ -8,7 +8,10 @@ static IMU_RawDataDef _calib_raw = {0};
 static IMU_UnitDataDef _imu_unit = {0};
 
 static Quaternion DroneQuaternion = {1, 0, 0, 0};
+static Quaternion FilpRotateQuaternion = {0, 0, 1, 0};
+static Quaternion DroneFilpQuaternion = {1, 0, 0, 0};
 static EulerRPY DroneEulerAngle = {0};
+static EulerRPY DroneFilpEulerAngle = {0};
 
 void IMU_DataPreProcessTask(uint8_t millis)
 {
@@ -42,8 +45,13 @@ void IMU_DataPreProcessTask(uint8_t millis)
 	else kp = 5.0f;
 	FusionQuaternion6Axis(&_imu_unit, &DroneQuaternion, millis, kp, 0.0f);
 	ConvertQuaternion2Euler(&DroneQuaternion, &DroneEulerAngle);
+	QuaternionMultiplicationCross(&DroneQuaternion, &FilpRotateQuaternion, &DroneFilpQuaternion);
+	ConvertQuaternion2Euler(&DroneFilpQuaternion, &DroneFilpEulerAngle);
 }
 
 inline IMU_UnitDataDef *GetIMU_Unit_DATA(void) { return &_imu_unit; }
 inline Quaternion *GetDroneQuaternion(void) { return &DroneQuaternion; }
 inline EulerRPY *GetDroneEulerAngle(void) { return &DroneEulerAngle; }
+
+inline Quaternion *GetDroneFilpQuatnion(void) { return &DroneFilpQuaternion; }
+inline EulerRPY *GetDroneFilpEulerAngle(void) { return &DroneFilpEulerAngle; }
