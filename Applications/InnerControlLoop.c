@@ -29,7 +29,7 @@ void InnerLoopCtrlTask(uint8_t millis)
 		pidPitRate.Isum = pidRolRate.Isum = pidYawRate.Isum = 0.0f;
 	}
 
-	SetMotorControlParam(-pidPitRate.Output, pidRolRate.Output, -pidYawRate.Output);
+	SetMotorControlParam(-pidPitRate.Output, +pidRolRate.Output, -pidYawRate.Output);
 }
 
 static void CtrlParamInit(uint8_t millis)
