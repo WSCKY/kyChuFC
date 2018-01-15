@@ -12,10 +12,19 @@ static void StartMotorBeep(const ToneDataDef *pTone);
 void MotorControlTask(uint8_t millis)
 {
 	float max_val = 0, min_val = 0;
-	float MotorExp_1 = + PitchOut + RollOut - YawOut + ThrottleOut;
-	float MotorExp_2 = + PitchOut - RollOut + YawOut + ThrottleOut;
-	float MotorExp_3 = - PitchOut - RollOut - YawOut + ThrottleOut;
-	float MotorExp_4 = - PitchOut + RollOut + YawOut + ThrottleOut;
+	float MotorExp_1, MotorExp_2, MotorExp_3, MotorExp_4;
+
+	if(_motor_dir == DIR_FORWARD) {
+		MotorExp_1 = + PitchOut + RollOut - YawOut + ThrottleOut;
+		MotorExp_2 = + PitchOut - RollOut + YawOut + ThrottleOut;
+		MotorExp_3 = - PitchOut - RollOut - YawOut + ThrottleOut;
+		MotorExp_4 = - PitchOut + RollOut + YawOut + ThrottleOut;
+	} else if(_motor_dir == DIR_NEGATER) {
+		MotorExp_1 = - PitchOut - RollOut + YawOut + ThrottleOut;
+		MotorExp_2 = - PitchOut + RollOut - YawOut + ThrottleOut;
+		MotorExp_3 = + PitchOut + RollOut + YawOut + ThrottleOut;
+		MotorExp_4 = + PitchOut - RollOut - YawOut + ThrottleOut;
+	}
 
 	if(MotorExp_1 > MOTOR_CONTROL_RANGE_MAX || MotorExp_2 > MOTOR_CONTROL_RANGE_MAX || \
 	   MotorExp_3 > MOTOR_CONTROL_RANGE_MAX || MotorExp_4 > MOTOR_CONTROL_RANGE_MAX) {
@@ -142,4 +151,5 @@ void SetMotorControlParam(float pitch, float roll, float yaw)
 }
 
 void SetDroneThrottle(float thr) { ThrottleOut = thr; }
+MOTOR_RUN_DIR GetMotorRunDir(void) { return _motor_dir; }
 void SetMotorRunDir(MOTOR_RUN_DIR _dir) { _motor_dir = _dir; }

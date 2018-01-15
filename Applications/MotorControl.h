@@ -25,6 +25,7 @@ typedef enum {
 void MotorControlTask(uint8_t millis);
 void SendMotorBeepRequest(AudioTypeDef req);
 void SetDroneThrottle(float thr);
+MOTOR_RUN_DIR GetMotorRunDir(void);
 void SetMotorRunDir(MOTOR_RUN_DIR _dir);
 void SetMotorControlParam(float pitch, float roll, float yaw);
 
