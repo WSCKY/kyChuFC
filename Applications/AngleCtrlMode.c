@@ -2,6 +2,7 @@
 
 static uint8_t _init_flag = 0;
 static EulerRPY *pDroneEluer;
+static uint8_t _reversal_flag = 0;
 static RF_COMMAND_DEF *pRF_CMD = {0};
 static PID pidPitch = {0}, pidRoll = {0};//, pidYaw = {0};
 
@@ -21,15 +22,37 @@ void AngleCtrlModeTask(uint8_t millis)
 	exp_pit = LinearMap(((RF_COMMAND_UNIT_MID << 1) - pRF_CMD->Pitch), RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX, -30.0f, 30.0f);
 	exp_rol = LinearMap(pRF_CMD->Roll, RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX, -30.0f, 30.0f);
 	exp_yaw = LinearMap(((RF_COMMAND_UNIT_MID << 1) - pRF_CMD->Yaw), RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX, -180.0f, 180.0f);
+	if(_reversal_flag == 1) {
+		exp_pit = -exp_pit;
+//		exp_rol = -exp_rol;
+		exp_yaw = -exp_yaw;
+	}
 
 	PID_LOOP(&pidPitch, exp_pit, pDroneEluer->Pitch);
 	PID_LOOP(&pidRoll, exp_rol, pDroneEluer->Roll);
 
 	if(GetFlyEnableState() == Disabled) {
 		pidPitch.Isum = pidRoll.Isum = 0.0f;
+		if(pRF_CMD->RevTrigSwitch == DualState_High) {
+			_reversal_flag = 1;
+			pDroneEluer = GetDroneFlipEulerAngle();
+		} else {
+			_reversal_flag = 0;
+			pDroneEluer = GetDroneEulerAngle();
+		}
 	}
+//	if(_reversal_flag == 1) {
+//		pidRoll.Output = 0;
+//		pidPitch.Output = 0;
+//		exp_yaw = 0;
+//	}
 
 	SetInnerLoopExpParam(pidRoll.Output, pidPitch.Output, exp_yaw);//(0, 0, 0);//
+	SetDroneThrottle(pRF_CMD->Throttle - 1000);
+	if(_reversal_flag == 0)
+		SetMotorRunDir(DIR_FORWARD);
+	else
+		SetMotorRunDir(DIR_NEGATER);
 }
 
 static void CtrlParamInit(uint8_t millis)
