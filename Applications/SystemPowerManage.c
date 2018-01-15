@@ -34,6 +34,7 @@ void DroneAutoPowerOffTask(uint8_t millis)
 				PowerOffRequestFlag = 1;
 		}
 	} else {
+		KeyPressTimeCnt = 0;
 		_key_release_init = Key_Released;
 	}
 
