@@ -22,12 +22,12 @@
 #include "MCU_Periph.h"
 
 #include "MotorControl.h"
-#include "AngleCtrlMode.h"
 #include "FlyStateManage.h"
 #include "RF_DataProcess.h"
 #include "GyroStableCheck.h"
 #include "IMU_DataProcess.h"
 #include "InnerControlLoop.h"
+#include "FlightModeManage.h"
 #include "SystemPowerManage.h"
 
 /* Macros --------------------------------------------------------------------*/
