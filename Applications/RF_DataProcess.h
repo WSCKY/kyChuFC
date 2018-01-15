@@ -45,7 +45,8 @@ typedef struct {
 	FlightModeDef Mode;
 	DualState TrigSwitch;
 	TriState CmdSwitch;
-	uint16_t RevChannel[5];
+	DualState RevTrigSwitch;
+	TriState RevTriState[4];
 } RF_COMMAND_DEF;
 
 void RF_DataProcessTask(uint8_t millis);

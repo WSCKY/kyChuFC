@@ -36,13 +36,22 @@ void RF_DataProcessTask(uint8_t millis)
 		_rf_command.TrigSwitch = (pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[11] > RF_CHANNEL_RAW_MID + RF_CHANNEL_RAW_DEADBAND) ? \
 			DualState_High : DualState_Low;
 		_rf_command.CmdSwitch = (pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[10] < RF_CHANNEL_RAW_MIN + RF_CHANNEL_RAW_DEADBAND) ? \
-				TriState_Low : ((pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[10] > RF_CHANNEL_RAW_MAX - RF_CHANNEL_RAW_DEADBAND) ? \
-				TriState_High : TriState_Mid);
-		_rf_command.RevChannel[0] = LinearMap(pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[4], RF_CHANNEL_RAW_MIN, RF_CHANNEL_RAW_MAX, RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX);
-		_rf_command.RevChannel[1] = LinearMap(pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[5], RF_CHANNEL_RAW_MIN, RF_CHANNEL_RAW_MAX, RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX);
-		_rf_command.RevChannel[2] = LinearMap(pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[7], RF_CHANNEL_RAW_MIN, RF_CHANNEL_RAW_MAX, RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX);
-		_rf_command.RevChannel[3] = LinearMap(pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[8], RF_CHANNEL_RAW_MIN, RF_CHANNEL_RAW_MAX, RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX);
-		_rf_command.RevChannel[4] = LinearMap(pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[9], RF_CHANNEL_RAW_MIN, RF_CHANNEL_RAW_MAX, RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX);
+			TriState_Low : ((pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[10] > RF_CHANNEL_RAW_MAX - RF_CHANNEL_RAW_DEADBAND) ? \
+			TriState_High : TriState_Mid);
+		_rf_command.RevTrigSwitch = (pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[9] > RF_CHANNEL_RAW_MID + RF_CHANNEL_RAW_DEADBAND) ? \
+			DualState_High : DualState_Low;
+		_rf_command.RevTriState[0] = (pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[7] < RF_CHANNEL_RAW_MIN + RF_CHANNEL_RAW_DEADBAND) ? \
+			TriState_Low : ((pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[7] > RF_CHANNEL_RAW_MAX - RF_CHANNEL_RAW_DEADBAND) ? \
+			TriState_High : TriState_Mid);
+		_rf_command.RevTriState[1] = (pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[4] < RF_CHANNEL_RAW_MIN + RF_CHANNEL_RAW_DEADBAND) ? \
+			TriState_Low : ((pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[4] > RF_CHANNEL_RAW_MAX - RF_CHANNEL_RAW_DEADBAND) ? \
+			TriState_High : TriState_Mid);
+		_rf_command.RevTriState[2] = (pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[5] < RF_CHANNEL_RAW_MIN + RF_CHANNEL_RAW_DEADBAND) ? \
+			TriState_Low : ((pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[5] > RF_CHANNEL_RAW_MAX - RF_CHANNEL_RAW_DEADBAND) ? \
+			TriState_High : TriState_Mid);
+		_rf_command.RevTriState[3] = (pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[8] < RF_CHANNEL_RAW_MIN + RF_CHANNEL_RAW_DEADBAND) ? \
+			TriState_Low : ((pWifiPacket->Packet.PacketData.WifiRcRaw.Channel[8] > RF_CHANNEL_RAW_MAX - RF_CHANNEL_RAW_DEADBAND) ? \
+			TriState_High : TriState_Mid);
 	} else {
 		if(SignalLostTimeCnt * millis < SIGNAL_LOST_CONFIRM_TIME) {
 			SignalLostTimeCnt ++;
