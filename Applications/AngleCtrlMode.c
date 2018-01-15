@@ -41,11 +41,6 @@ void AngleCtrlModeTask(uint8_t millis)
 			pDroneEluer = GetDroneEulerAngle();
 		}
 	}
-//	if(_reversal_flag == 1) {
-//		pidRoll.Output = 0;
-//		pidPitch.Output = 0;
-//		exp_yaw = 0;
-//	}
 
 	SetInnerLoopExpParam(pidRoll.Output, pidPitch.Output, exp_yaw);//(0, 0, 0);//
 	SetDroneThrottle(pRF_CMD->Throttle - 1000);
