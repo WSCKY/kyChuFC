@@ -17,8 +17,15 @@ typedef enum {
 	Delaying = 1
 } BEEP_DELAY_STATE;
 
+typedef enum {
+	DIR_FORWARD = 0,
+	DIR_NEGATER = 1
+} MOTOR_RUN_DIR;
+
 void MotorControlTask(uint8_t millis);
 void SendMotorBeepRequest(AudioTypeDef req);
-void SetMotorControlParam(float pitch, float roll, float yaw, float thr);
+void SetDroneThrottle(float thr);
+void SetMotorRunDir(MOTOR_RUN_DIR _dir);
+void SetMotorControlParam(float pitch, float roll, float yaw);
 
 #endif /* __MOTORCONTROL_H */

@@ -2,6 +2,7 @@
 
 static uint8_t MotorBeepReadyFlag = 0;
 static uint32_t MotorBeepReadyTimeCnt = 0;
+static MOTOR_RUN_DIR _motor_dir = DIR_FORWARD;
 static float PitchOut = 0, RollOut = 0, YawOut = 0, ThrottleOut = 0;
 
 static void StopMotorBeep(void);
@@ -39,7 +40,10 @@ void MotorControlTask(uint8_t millis)
 			MotorBeepReadyFlag = 0;
 			MotorBeepReadyTimeCnt = 0;
 		}
-		MOTOR_FORWARD_SPEED(MotorExp_1, MotorExp_2, MotorExp_3, MotorExp_4);
+		if(_motor_dir == DIR_FORWARD)
+			MOTOR_FORWARD_SPEED(MotorExp_1, MotorExp_2, MotorExp_3, MotorExp_4);
+		else if(_motor_dir == DIR_NEGATER)
+			MOTOR_NEGATER_SPEED(MotorExp_1, MotorExp_2, MotorExp_3, MotorExp_4);
 	} else {
 		if(MotorBeepReadyFlag == 0) {
 			MOTOR_FORWARD_SPEED(0, 0, 0, 0);
@@ -130,10 +134,12 @@ void SendMotorBeepRequest(AudioTypeDef req)
 	UsrBeepReq |= (1 << req);
 }
 
-void SetMotorControlParam(float pitch, float roll, float yaw, float thr)
+void SetMotorControlParam(float pitch, float roll, float yaw)
 {
 	PitchOut = pitch;
 	RollOut = roll;
 	YawOut = yaw;
-	ThrottleOut = thr;
 }
+
+void SetDroneThrottle(float thr) { ThrottleOut = thr; }
+void SetMotorRunDir(MOTOR_RUN_DIR _dir) { _motor_dir = _dir; }
