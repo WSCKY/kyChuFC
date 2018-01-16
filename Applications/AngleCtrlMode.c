@@ -3,7 +3,8 @@
 static uint8_t _init_flag = 0;
 static EulerRPY *pDroneEluer;
 static uint8_t _reversal_flag = 0;
-static RF_COMMAND_DEF *pRF_CMD = {0};
+static RF_COMMAND_DEF *pRF_CMD;
+static IMU_UnitDataDef *pIMU;
 static PID pidPitch = {0}, pidRoll = {0};//, pidYaw = {0};
 
 static void CtrlParamInit(uint8_t millis);
@@ -16,6 +17,7 @@ void AngleCtrlModeTask(uint8_t millis)
 
 		CtrlParamInit(millis);
 		pRF_CMD = GetRFCommand();
+		pIMU = GetIMU_Unit_DATA();
 		pDroneEluer = GetDroneEulerAngle();
 	}
 
@@ -33,7 +35,7 @@ void AngleCtrlModeTask(uint8_t millis)
 
 	if(GetFlyEnableState() == Disabled) {
 		pidPitch.Isum = pidRoll.Isum = 0.0f;
-		if(pRF_CMD->RevTrigSwitch == DualState_High) {
+		if(pIMU->Acc.Z < -0.0f) {
 			_reversal_flag = 1;
 			pDroneEluer = GetDroneFlipEulerAngle();
 		} else {
