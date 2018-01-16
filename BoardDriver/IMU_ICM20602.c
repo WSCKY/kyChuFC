@@ -8,7 +8,6 @@ static uint8_t _tx_rx_comp = 0;
 static uint8_t _tx_buffer[15] = {0};
 static uint8_t _rx_buffer[15] = {0};
 
-static void _IMU_CS_PIN_INIT(void);
 static HAL_StatusTypeDef _IMU_Configure(void);
 static HAL_StatusTypeDef IMU_WriteReg(uint8_t reg, uint8_t val);
 static HAL_StatusTypeDef IMU_ReadReg(uint8_t reg, uint8_t num, uint8_t *r);
@@ -17,7 +16,6 @@ static HAL_StatusTypeDef IMU_ReadRegUtil(uint8_t reg, uint8_t num, uint8_t *r);
 HAL_StatusTypeDef IMU_ICM20602_Init(void)
 {
 	HAL_StatusTypeDef ret = HAL_ERROR;
-	_IMU_CS_PIN_INIT();
 	ret = _IMU_Configure();
 	return ret;
 }
@@ -91,7 +89,7 @@ static HAL_StatusTypeDef _IMU_Configure(void)
 static HAL_StatusTypeDef IMU_WriteReg(uint8_t reg, uint8_t val)
 {
 	HAL_StatusTypeDef ret = HAL_ERROR;
-	IMU_SPI_CS_LOW();
+	IMU_SPI_CS_ENABLE();
 	_tx_rx_comp = 0;
 	_tx_buffer[0] = reg;
 	_tx_buffer[1] = val;
@@ -104,7 +102,7 @@ static HAL_StatusTypeDef IMU_WriteReg(uint8_t reg, uint8_t val)
 
 static HAL_StatusTypeDef IMU_ReadReg(uint8_t reg, uint8_t num, uint8_t *r)
 {
-	IMU_SPI_CS_LOW();
+	IMU_SPI_CS_ENABLE();
 	_tx_rx_comp = 0;
 	_tx_buffer[0] = reg | 0x80;
 	return IMU_TxRxData((uint8_t *)_tx_buffer, (uint8_t *)r, num + 1); //ignore the first byte.
@@ -113,7 +111,7 @@ static HAL_StatusTypeDef IMU_ReadReg(uint8_t reg, uint8_t num, uint8_t *r)
 static HAL_StatusTypeDef IMU_ReadRegUtil(uint8_t reg, uint8_t num, uint8_t *r)
 {
 	HAL_StatusTypeDef ret = HAL_ERROR;
-	IMU_SPI_CS_LOW();
+	IMU_SPI_CS_ENABLE();
 	_tx_rx_comp = 0;
 	_tx_buffer[0] = reg | 0x80;
 	ret = IMU_TxRxData((uint8_t *)_tx_buffer, (uint8_t *)r, num + 1); //ignore the first byte.
@@ -126,24 +124,10 @@ static HAL_StatusTypeDef IMU_ReadRegUtil(uint8_t reg, uint8_t num, uint8_t *r)
 void IMU_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 {
 	_tx_rx_comp = 1;
-	IMU_SPI_CS_HIGH();
+	IMU_SPI_CS_DISABLE();
 }
 
 void IMU_TxRxErrorCallback(SPI_HandleTypeDef *hspi)
 {
 
-}
-
-static void _IMU_CS_PIN_INIT(void)
-{
-	GPIO_InitTypeDef  GPIO_InitStruct;
-	IMU_SPI_CS_GPIO_CLK_ENABLE();
-	/* SPI CS GPIO pin configuration  */
-	GPIO_InitStruct.Pull  = GPIO_PULLUP;
-	GPIO_InitStruct.Pin   = IMU_SPI_CS_PIN;
-	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-	GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
-	HAL_GPIO_Init(IMU_SPI_CS_GPIO_PORT, &GPIO_InitStruct);
-	/* set CS pin to default high */
-	HAL_GPIO_WritePin(IMU_SPI_CS_GPIO_PORT, IMU_SPI_CS_PIN, GPIO_PIN_SET);
 }
