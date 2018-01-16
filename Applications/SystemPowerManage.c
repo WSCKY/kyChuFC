@@ -35,6 +35,8 @@ void BatteryVoltageCheckTask(uint8_t millis)
 	}
 }
 
+inline BATTERY_STATE GetBatteryState(void) { return BatteryState; }
+
 void SetVoltageCalibParam(float _k, float _b) { _volt_calib_k = _k; _volt_calib_b = _b; }
 
 float GetSystemVoltage(void) { return _system_volt; }

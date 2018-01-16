@@ -28,6 +28,8 @@ void BatteryVoltageCheckTask(uint8_t millis);
 void DroneAutoPowerOffTask(uint8_t millis);
 
 float GetSystemVoltage(void);
+BATTERY_STATE GetBatteryState(void);
+
 void SendSystemPowerOffReq(void);
 void SetVoltageCalibParam(float _k, float _b);
 
