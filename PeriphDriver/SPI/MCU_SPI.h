@@ -21,7 +21,7 @@
 /* Exported constants --------------------------------------------------------*/
 /* Exported definitions ------------------------------------------------------*/
 #define SPI2_ENABLE                              (1)
-#define SPI4_ENABLE                              (0)
+#define SPI4_ENABLE                              (1)
 
 #if (SPI2_ENABLE)
   #define SPI2_MODE_MASTER                       (1)
