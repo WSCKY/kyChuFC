@@ -36,6 +36,8 @@
 #define IMU_TxRxData                             SPI2_TxRxData_DMA
 #define IMU_TxRxCpltCallback                     MCU_SPI2_TxRxCpltCallback
 #define IMU_TxRxErrorCallback                    MCU_SPI2_ErrorCallback
+#define IMU_SPI_CS_ENABLE()                      MCU_GPIO_SetLevelLow(2)
+#define IMU_SPI_CS_DISABLE()                     MCU_GPIO_SetLevelHigh(2)
 
 /* BARO MCP2520 Linker */
 #define BARO_SPI                                 SPI4
