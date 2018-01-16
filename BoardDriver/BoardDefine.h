@@ -13,9 +13,9 @@
 #define SYSTEM_POWER_KEY_STATE()                 MCU_GPIO_ReadLevel(0)
 
 /* Board LED Linker */
-#define LED_RED_ON()                             MCU_GPIO_SetLevelHigh(5)
-#define LED_RED_OFF()                            MCU_GPIO_SetLevelLow(5)
-#define LED_RED_TOG()                            MCU_GPIO_SetLevelToggle(5)
+#define LED_RED_ON()                             MCU_GPIO_SetLevelHigh(6)
+#define LED_RED_OFF()                            MCU_GPIO_SetLevelLow(6)
+#define LED_RED_TOG()                            MCU_GPIO_SetLevelToggle(6)
 
 #define LED_BLUE_ON()                            MCU_GPIO_SetLevelHigh(4)
 #define LED_BLUE_OFF()                           MCU_GPIO_SetLevelLow(4)
@@ -43,6 +43,9 @@
 #define BARO_SPI                                 SPI4
 #define BARO_TxRxData                            SPI4_TxRxData_DMA
 #define BARO_TxRxCpltCallback                    MCU_SPI4_TxRxCpltCallback
+#define BARO_TxRxErrorCallback                   MCU_SPI4_ErrorCallback
+#define BARO_SPI_CS_ENABLE()                     MCU_GPIO_SetLevelLow(5)
+#define BARO_SPI_CS_DISABLE()                    MCU_GPIO_SetLevelHigh(5)
 
 /* MOTOR Driver Linker */
 #define MOTOR_FORWARD_SPEED(a,b,c,d)             do {TIM2_PWM_SetPulse(a, 0, b, 0); TIM5_PWM_SetPulse(c, 0, d, 0);} while(0)
