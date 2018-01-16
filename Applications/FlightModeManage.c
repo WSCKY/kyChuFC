@@ -15,7 +15,7 @@ void FlightModeManageTask(uint8_t millis)
 		if(pRF_CMD->Mode == FlightMode1) {
 			AngleCtrlModeTask(millis);
 		} else if(pRF_CMD->Mode == FlightMode2) {
-			AngleCtrlModeTask(millis);
+			FlipCtrlModeTask(millis);
 		} else if(pRF_CMD->Mode == FlightMode3) {
 			AngleCtrlModeTask(millis);
 		} else {

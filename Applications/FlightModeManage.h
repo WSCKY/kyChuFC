@@ -2,6 +2,7 @@
 #define __FLIGHTMODEMANAGE_H
 
 #include "AngleCtrlMode.h"
+#include "FlipCtrlMode.h"
 
 #include "MotorControl.h"
 #include "RF_DataProcess.h"
