@@ -1,5 +1,7 @@
 #include "FlipCtrlMode.h"
 
+#define FLIP_START_WAIT_TIME                     (200)
+
 static uint8_t _init_flag = 0;
 static EulerRPY *pDroneEluer;
 static uint8_t _reversal_flag = 0;
@@ -7,16 +9,17 @@ static RF_COMMAND_DEF *pRF_CMD;
 static IMU_UnitDataDef *pIMU;
 static PID pidPitch = {0}, pidRoll = {0};//, pidYaw = {0};
 
-static uint8_t FlipReq = 0;
-static uint8_t WaitTime = 0;
-static uint8_t FlipStartTime = 0;
-static uint8_t _in_flip_flag = 0;
+static uint8_t DirTrigFlag = 0;
+static uint8_t FlipStartTimeCnt = 0;
+static uint8_t FlipEndWaitTimeCnt = 0;
+static FLIP_STATE _flip_state = Flip_Stop;
+static FLIP_DIRECTION _flip_dir = Flip_Left;
 
 static void CtrlParamInit(uint8_t millis);
 
 void FlipCtrlModeTask(uint8_t millis)
 {
-	float integ_x, integ_y, flip_thr;
+	static float integ_x, integ_y, cur_integ, flip_thr;
 	static float exp_pit = 0.0f, exp_rol = 0.0f, exp_yaw = 0.0f;
 	if(_init_flag == 0) {
 		_init_flag = 1;
@@ -26,23 +29,38 @@ void FlipCtrlModeTask(uint8_t millis)
 		pIMU = GetIMU_Unit_DATA();
 		pDroneEluer = GetDroneEulerAngle();
 	}
-	if(pRF_CMD->RevTrigSwitch == DualState_Low) {
-		_in_flip_flag = 0;//wait for rcommand.
+	if(pRF_CMD->RevTrigSwitch == DualState_Low && _flip_state == Flip_Ended) {
+		_flip_state = Flip_Stop; // reset flip state.
 	}
-	if(pRF_CMD->RevTrigSwitch == DualState_High && _in_flip_flag == 0) {
-		if((pRF_CMD->Roll > RF_COMMAND_UNIT_MID + 400) && FlipReq == 0) {
-			FlipReq = 1;
-		} else if(FlipReq == 1 && (pRF_CMD->Roll < RF_COMMAND_UNIT_MID + 100)) {
-			FlipReq = 0;
-			WaitTime = 0;
-			flip_thr = pRF_CMD->Throttle - 1000;
-			FlipStartTime = 0;
-			_in_flip_flag = 1; //start.
-			GyrIntegrationReset();
-			exp_pit = exp_rol = exp_yaw = 0;
-			pidPitch.Isum = pidRoll.Isum = 0.0f;
+	if(pRF_CMD->RevTrigSwitch == DualState_High && _flip_state == Flip_Stop) {
+		exp_pit = exp_rol = exp_yaw = 0;
+		if(DirTrigFlag == 0) { // detect direction.
+			if(pRF_CMD->Roll > RF_COMMAND_UNIT_MAX - RF_COMMAND_UNIT_DEADBAND) {
+				_flip_dir = Flip_Right;
+				DirTrigFlag = 1; // mark it.
+			} else if(pRF_CMD->Roll < RF_COMMAND_UNIT_MIN + RF_COMMAND_UNIT_DEADBAND) {
+				_flip_dir = Flip_Left;
+				DirTrigFlag = 1; // mark it.
+			} else if(pRF_CMD->Pitch < RF_COMMAND_UNIT_MIN + RF_COMMAND_UNIT_DEADBAND) {
+				_flip_dir = Flip_Forward;
+				DirTrigFlag = 1; // mark it.
+			} else if(pRF_CMD->Pitch > RF_COMMAND_UNIT_MAX - RF_COMMAND_UNIT_DEADBAND) {
+				_flip_dir = Flip_Backward;
+				DirTrigFlag = 1; // mark it.
+			}
+		} else if(DirTrigFlag == 1) { // start flip.
+			if(ABS((int16_t)pRF_CMD->Roll - (int16_t)RF_COMMAND_UNIT_MID) < 100 && \
+			   ABS((int16_t)pRF_CMD->Pitch - (int16_t)RF_COMMAND_UNIT_MID) < 100) {
+				DirTrigFlag = 0; // clear flag.
+				FlipStartTimeCnt = 0;
+				FlipEndWaitTimeCnt = 0;
+				GyrIntegrationReset();
+				flip_thr = pRF_CMD->Throttle - 1000;
+				pidPitch.Isum = pidRoll.Isum = 0.0f;
+				_flip_state = Flip_Start; //start.
+			}
 		}
-	} else if(_in_flip_flag != 1) {
+	} else if(_flip_state != Flip_Start) {
 		exp_pit = LinearMap(((RF_COMMAND_UNIT_MID << 1) - pRF_CMD->Pitch), RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX, -30.0f, 30.0f);
 		exp_rol = LinearMap(pRF_CMD->Roll, RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX, -30.0f, 30.0f);
 		exp_yaw = LinearMap(((RF_COMMAND_UNIT_MID << 1) - pRF_CMD->Yaw), RF_COMMAND_UNIT_MIN, RF_COMMAND_UNIT_MAX, -180.0f, 180.0f);
@@ -53,21 +71,67 @@ void FlipCtrlModeTask(uint8_t millis)
 		}
 	}
 
-	GetGyrIntegration(&integ_x, &integ_y);
-	if(_in_flip_flag != 1) {
+	if(_flip_state != Flip_Start) {
 		PID_LOOP(&pidPitch, exp_pit, pDroneEluer->Pitch);
 		PID_LOOP(&pidRoll, exp_rol, pDroneEluer->Roll);
 	} else {
-		if(FlipStartTime < 50)
-			FlipStartTime ++;
-		else if(exp_rol < 360.0f)
-			exp_rol += 24.0f;
+		GetGyrIntegration(&integ_x, &integ_y);
+		if(FlipStartTimeCnt * millis < FLIP_START_WAIT_TIME)
+			FlipStartTimeCnt ++;
 		else {
-			if(integ_x < 360) {
-				if(WaitTime * millis < 100)
-					WaitTime ++;
-				else
-					_in_flip_flag = 2;
+			switch(_flip_dir) {
+			case Flip_Right:
+				cur_integ = ABS(integ_x);
+				if(exp_rol < 360.0f)
+					exp_rol += 24.0f; /* about 150ms. */
+				else {
+					if(integ_x < 360) {
+						if(FlipEndWaitTimeCnt * millis < 100) // wait 100ms.
+							FlipEndWaitTimeCnt ++;
+						else
+							_flip_state = Flip_Ended;
+					}
+				}
+			break;
+			case Flip_Left:
+				cur_integ = ABS(integ_x);
+				if(exp_rol > -360.0f)
+					exp_rol -= 24.0f; /* about 150ms. */
+				else {
+					if(integ_x > -360) {
+						if(FlipEndWaitTimeCnt * millis < 100) // wait 100ms.
+							FlipEndWaitTimeCnt ++;
+						else
+							_flip_state = Flip_Ended;
+					}
+				}
+			break;
+			case Flip_Forward:
+				cur_integ = ABS(integ_y);
+				if(exp_pit > -360.0f)
+					exp_pit -= 24.0f; /* about 150ms. */
+				else {
+					if(integ_y > -360) {
+						if(FlipEndWaitTimeCnt * millis < 100) // wait 100ms.
+							FlipEndWaitTimeCnt ++;
+						else
+							_flip_state = Flip_Ended;
+					}
+				}
+			break;
+			case Flip_Backward:
+				cur_integ = ABS(integ_y);
+				if(exp_pit < 360.0f)
+					exp_pit += 24.0f; /* about 150ms. */
+				else {
+					if(integ_y < 360) {
+						if(FlipEndWaitTimeCnt * millis < 100) // wait 100ms.
+							FlipEndWaitTimeCnt ++;
+						else
+							_flip_state = Flip_Ended;
+					}
+				}
+			break;
 			}
 		}
 		PID_LOOP(&pidPitch, exp_pit, integ_y);
@@ -85,25 +149,27 @@ void FlipCtrlModeTask(uint8_t millis)
 		}
 	}
 
-	if(_in_flip_flag != 1) {
+	if(_flip_state != Flip_Start) {
 		SetInnerLoopExpParam(pidRoll.Output, pidPitch.Output, exp_yaw);
 		SetDroneThrottle(pRF_CMD->Throttle - 1000);
 	} else {
 		SetInnerLoopExpParam(pidRoll.Output, pidPitch.Output, 0);
-		if(FlipStartTime < 12)
-			if(flip_thr < 1000)
-				flip_thr += 8;
-		if(integ_x <= 50) {
-			flip_thr = 1000;//LinearMap(integ_x, 0, 50, pRF_CMD->Throttle - 1000, 1000);
-		} else if(integ_x > 50 && integ_x <= 90) {
-			flip_thr = LinearMap(integ_x, 50, 90, 1000, 50);
-		} else if(integ_x > 90 && integ_x <= 270) {
+		if(FlipStartTimeCnt * millis < FLIP_START_WAIT_TIME) {
+			if(flip_thr < 1000) flip_thr += 10;
+		} else if(cur_integ <= 50) {
+			flip_thr = 888;//LinearMap(integ_x, 0, 50, pRF_CMD->Throttle - 1000, 1000);
+		} else if(cur_integ > 50 && cur_integ <= 90) {
+			flip_thr = LinearMap(cur_integ, 50, 90, 888, 50);
+		} else if(cur_integ > 90 && cur_integ <= 270) {
 			flip_thr = 50;
-		} else if(integ_x <= 360) {
-			flip_thr = LinearMap(integ_x, 270, 360, 50, 1000);
-		} else {
+		} else if(cur_integ <= 360) {
+			if(flip_thr < 700) flip_thr = 700;
+			else if(flip_thr < 1000) flip_thr += 10;
+//			flip_thr = LinearMap(cur_integ, 270, 360, 666, 999); // throttle jump.
+		} else { // out of 360deg.
 			flip_thr = pRF_CMD->Throttle - 1000;
-			_in_flip_flag = 2;
+			_flip_state = Flip_Ended;
+			pidPitch.Isum = pidRoll.Isum = 0.0f;
 		}
 		SetDroneThrottle(flip_thr);
 	}
