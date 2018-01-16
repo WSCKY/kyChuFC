@@ -92,7 +92,7 @@ static void _led_set_color(uint8_t color)
 {
 	if(color & LED_COLOR_RED) LED_RED_ON(); else LED_RED_OFF();
 	if(color & LED_COLOR_BLUE) LED_BLUE_ON(); else LED_BLUE_OFF();
-	if(color & LED_COLOR_GREEN) LEDGREEN_ON(); else LED_GREEN_OFF();
+	if(color & LED_COLOR_GREEN) LED_GREEN_ON(); else LED_GREEN_OFF();
 }
 
 inline void LedCtrlInsertNotice(void) { _led_ctrl_injected = 1; }
