@@ -16,6 +16,7 @@ static HAL_StatusTypeDef IMU_ReadRegUtil(uint8_t reg, uint8_t num, uint8_t *r);
 HAL_StatusTypeDef IMU_ICM20602_Init(void)
 {
 	HAL_StatusTypeDef ret = HAL_ERROR;
+	IMU_SPI_CS_DISABLE();
 	ret = _IMU_Configure();
 	return ret;
 }
