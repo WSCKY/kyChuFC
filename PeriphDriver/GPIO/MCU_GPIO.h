@@ -29,13 +29,14 @@ typedef struct {
 /* Exported constants --------------------------------------------------------*/
 /* Exported definitions ------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/
-#define GPIO_INIT_QTY                            (6)
+#define GPIO_INIT_QTY                            (7)
 
 #define GPIO_PORT_INIT_TABLE                     {{GPIOB, GPIO_PIN_0, GPIO_MODE_INPUT, GPIO_NOPULL, GPIO_SPEED_HIGH, GPIO_PIN_RESET}, \
 	                                              {GPIOB, GPIO_PIN_1, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, GPIO_SPEED_FREQ_LOW, GPIO_PIN_RESET}, \
                                                   {GPIOB, GPIO_PIN_12, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, GPIO_SPEED_HIGH, GPIO_PIN_RESET}, \
                                                   {GPIOD, GPIO_PIN_14, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, GPIO_SPEED_FREQ_LOW, GPIO_PIN_RESET}, \
 	                                              {GPIOD, GPIO_PIN_15, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, GPIO_SPEED_FREQ_LOW, GPIO_PIN_RESET}, \
+												  {GPIOE, GPIO_PIN_11, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, GPIO_SPEED_HIGH, GPIO_PIN_RESET}, \
 	                                              {GPIOE, GPIO_PIN_15, GPIO_MODE_OUTPUT_PP, GPIO_PULLUP, GPIO_SPEED_FREQ_LOW, GPIO_PIN_RESET}}
 
 #define GPIO_PORT_CLK_ENABLE_ALL()               {__HAL_RCC_GPIOA_CLK_ENABLE(); \
