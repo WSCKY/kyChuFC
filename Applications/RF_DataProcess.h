@@ -18,6 +18,8 @@
 #define RF_COMMAND_UNIT_MID                      (1500)
 #define RF_COMMAND_UNIT_MIN                      (1000)
 
+#define RF_COMMAND_UNIT_DEADBAND                 (100)
+
 typedef enum {
 	FlightMode_None = 0,
 	FlightMode1 = 1,
