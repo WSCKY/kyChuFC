@@ -22,7 +22,7 @@ void LEDIndicatorTask(uint8_t millis)
 		LED_GREEN_OFF();
 	}
 
-	if(_power_on_loop == 0) {
+	if(_power_on_loop < 3) {
 		LedPwerOnLoop(millis); return;
 	}
 
@@ -75,7 +75,7 @@ static void LedPwerOnLoop(uint8_t millis)
 	if(FlashTimeCnt * millis < 150) { LED_RED_OFF(); LED_BLUE_ON(); LED_GREEN_OFF(); return; }
 	if(FlashTimeCnt * millis < 300) { LED_RED_ON(); LED_BLUE_OFF(); LED_GREEN_OFF(); return; }
 	if(FlashTimeCnt * millis < 450) { LED_RED_OFF(); LED_BLUE_OFF(); LED_GREEN_ON(); return; }
-	FlashTimeCnt = 0; _power_on_loop = 1;
+	FlashTimeCnt = 0; _power_on_loop += 1;
 }
 
 static void LedInjectedLoop(uint8_t millis)
