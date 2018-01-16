@@ -3,6 +3,10 @@
 static void _shut_down(void);
 
 static float _system_volt = 3.7f;
+static uint32_t BatteryLowPowerTimeCnt = 0;
+static uint32_t BatteryPreLowPowerTimeCnt = 0;
+static BATTERY_STATE BatteryState = POWER_ENOUGH;
+
 static float _volt_calib_k = 1.0f, _volt_calib_b = 0.0f;
 
 void BatteryVoltageCheckTask(uint8_t millis)
@@ -11,6 +15,24 @@ void BatteryVoltageCheckTask(uint8_t millis)
 	float _volt = VOLT_MEASURE_COEF * MCU_REF_VOLTAGE * _raw / 4096.0f;
 	/* apply low pass filter */
 	_system_volt = _system_volt * 0.95f + (_volt_calib_k * _volt + _volt_calib_b) * 0.05f;
+
+	if(_system_volt > BATTERY_PRELOW_POWER_VOLTAGE) {
+		BatteryLowPowerTimeCnt = 0;
+		BatteryPreLowPowerTimeCnt = 0;
+	} else if(_system_volt > BATTERY_LOW_POWER_VOLTAGE) {
+		if(BatteryPreLowPowerTimeCnt * millis < 1000)
+			BatteryPreLowPowerTimeCnt ++;
+		else if(BatteryState == POWER_ENOUGH)
+			BatteryState = LOW_POWER_LV1;
+	} else if(_system_volt > BATTERY_BAD_VOLTAGE) {
+		if(BatteryLowPowerTimeCnt * millis < 1000)
+			BatteryLowPowerTimeCnt ++;
+		else
+			BatteryState = LOW_POWER_LV2;
+	} else {
+		BatteryState = BAD_BATTERY;
+		_shut_down(); // force to shut down.
+	}
 }
 
 void SetVoltageCalibParam(float _k, float _b) { _volt_calib_k = _k; _volt_calib_b = _b; }
