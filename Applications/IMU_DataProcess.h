@@ -7,6 +7,9 @@
 
 void IMU_DataPreProcessTask(uint8_t millis);
 
+void GyrIntegrationReset(void);
+void GetGyrIntegration(float *x, float *y);
+
 IMU_UnitDataDef *GetIMU_Unit_DATA(void);
 Quaternion *GetDroneQuaternion(void);
 EulerRPY *GetDroneEulerAngle(void);
