@@ -34,11 +34,11 @@ void InnerLoopCtrlTask(uint8_t millis)
 
 static void CtrlParamInit(uint8_t millis)
 {
-	pidPitRate.kp = pidRolRate.kp = 0.5f;
+	pidPitRate.kp = pidRolRate.kp = 0.7f;
 	pidPitRate.ki = pidRolRate.ki = 0.2f;
 	pidPitRate.kd = pidRolRate.kd = 0.0f;
 
-	pidPitRate.Imax = pidRolRate.Imax = 100.0f;
+	pidPitRate.Imax = pidRolRate.Imax = 500.0f;
 	pidPitRate.Isum = pidRolRate.Isum = 0.0f;
 	pidPitRate.preErr = pidRolRate.preErr = 0.0f;
 
