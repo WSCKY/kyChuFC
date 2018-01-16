@@ -165,7 +165,6 @@ static void SystemMidFreqBThread(void const *p)
 			IMU_StableCalibrationTask(TaskT);
 			BatteryVoltageCheckTask(TaskT);
 			DroneAutoPowerOffTask(TaskT);
-			SendDataToWaveMonitor();
 		}
 	}
 }
@@ -186,12 +185,9 @@ static void SystemMiniFreqThread(void const *p)
 	(void) p;
 	uint32_t PreviousWakeTime = osKernelSysTick();
 	for(;;) {
-		osDelayUntil(&PreviousWakeTime, 200);
-		if(RfSignalIsLost()) {
-			LED_BLUE_TOG();
-		} else {
-			LED_GREEN_TOG();
-		}
+		osDelayUntil(&PreviousWakeTime, 10);
+		LEDIndicatorTask(10);
+		SendDataToWaveMonitor();
 	}
 }
 

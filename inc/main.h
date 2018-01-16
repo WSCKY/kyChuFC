@@ -26,6 +26,7 @@
 #include "RF_DataProcess.h"
 #include "GyroStableCheck.h"
 #include "IMU_DataProcess.h"
+#include "LEDIndicatorTask.h"
 #include "InnerControlLoop.h"
 #include "FlightModeManage.h"
 #include "SystemPowerManage.h"
