@@ -111,7 +111,7 @@ static HAL_StatusTypeDef SPI4_PeriphInit(void)
 	/*##-1- Configure the SPI peripheral #######################################*/
 	/* Set the SPI parameters */
 	Spi4Handle.Instance               = SPI4;
-	Spi4Handle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+	Spi4Handle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
 	Spi4Handle.Init.Direction         = SPI_DIRECTION_2LINES;
 	Spi4Handle.Init.CLKPhase          = SPI_PHASE_2EDGE;
 	Spi4Handle.Init.CLKPolarity       = SPI_POLARITY_HIGH;
