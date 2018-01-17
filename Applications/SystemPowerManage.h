@@ -7,8 +7,8 @@
 #define VOLT_MEASURE_COEF                        (2.0f)
 
 #define BATTERY_BAD_VOLTAGE                      (2.8f)
-#define BATTERY_LOW_POWER_VOLTAGE                (3.3f)
-#define BATTERY_PRELOW_POWER_VOLTAGE             (3.45f)
+#define BATTERY_LOW_POWER_VOLTAGE                (3.4f)
+#define BATTERY_PRELOW_POWER_VOLTAGE             (3.5f)
 
 #define POWEROFF_CONFIRM_TIME                    (2000)
 
