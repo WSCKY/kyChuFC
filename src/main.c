@@ -71,6 +71,9 @@ int main(void)
 	if(MCU_SPIs_Init() != HAL_OK) {
 		while(1);
 	}
+	if(MCU_ADCs_Init() != HAL_OK) {
+		while(1);
+	}
 	if(MCU_UARTs_Init() != HAL_OK) {
 		while(1);
 	}
@@ -80,7 +83,7 @@ int main(void)
 	if(IMU_ICM20602_Init() != HAL_OK) {
 		while(1);
 	}
-	if(MCU_ADCs_Init() != HAL_OK) {
+	if(BARO_MPC2520_Init() != HAL_OK) {
 		while(1);
 	}
 
@@ -176,6 +179,7 @@ static void SystemSlowFreqThread(void const *p)
 	for(;;) {
 		if( xSemaphoreTake( xSemaphore_SlowFreq, portMAX_DELAY ) == pdTRUE ) {
 			// ...
+			BARO_MPC2520_Read();
 		}
 	}
 }
