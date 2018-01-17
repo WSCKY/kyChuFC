@@ -55,7 +55,7 @@ static HAL_StatusTypeDef BARO_WriteReg(uint8_t reg, uint8_t val)
 	HAL_StatusTypeDef ret = HAL_ERROR;
 	uint8_t _tx_buffer[2];
 	uint8_t _rx_buffer[2];
-	IMU_SPI_CS_ENABLE();
+	BARO_SPI_CS_ENABLE();
 	_tx_rx_comp = 0;
 	_tx_buffer[0] = reg;
 	_tx_buffer[1] = val;
@@ -68,7 +68,7 @@ static HAL_StatusTypeDef BARO_WriteReg(uint8_t reg, uint8_t val)
 
 static HAL_StatusTypeDef BARO_ReadReg(uint8_t reg, uint8_t num, uint8_t *t, uint8_t *r)
 {
-	IMU_SPI_CS_ENABLE();
+	BARO_SPI_CS_ENABLE();
 	_tx_rx_comp = 0;
 	t[0] = reg | 0x80;
 	return BARO_TxRxData((uint8_t *)t, (uint8_t *)r, num + 1); //ignore the first byte.
@@ -77,7 +77,7 @@ static HAL_StatusTypeDef BARO_ReadReg(uint8_t reg, uint8_t num, uint8_t *t, uint
 static HAL_StatusTypeDef BARO_ReadRegUtil(uint8_t reg, uint8_t num, uint8_t *t, uint8_t *r)
 {
 	HAL_StatusTypeDef ret = HAL_ERROR;
-	IMU_SPI_CS_ENABLE();
+	BARO_SPI_CS_ENABLE();
 	_tx_rx_comp = 0;
 	t[0] = reg | 0x80;
 	ret = BARO_TxRxData((uint8_t *)t, (uint8_t *)r, num + 1); //ignore the first byte.
