@@ -46,6 +46,12 @@ typedef struct {
 } IMU_UnitDataDef;
 
 typedef struct {
+	float Pressure;
+	float Attitude;
+	float Temperature;
+} BARO_UnitDataDef;
+
+typedef struct {
 	float qw, qx, qy, qz;
 } Quaternion;
 
