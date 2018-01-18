@@ -167,7 +167,7 @@ static void BARO_ConvertRawToUnit(void)
 	 * h = -------------------------------  + h1
 	 *                   a
 	 */
-	_baro_unit_data.Attitude = (((pow((p / p1), (-(a * R) / g))) * T1) - T1) / a;
+	_baro_unit_data.Altitude = (((pow((p / p1), (-(a * R) / g))) * T1) - T1) / a;
 }
 
 static HAL_StatusTypeDef BARO_WriteReg(uint8_t reg, uint8_t val)

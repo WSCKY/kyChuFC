@@ -47,7 +47,7 @@ typedef struct {
 
 typedef struct {
 	float Pressure;
-	float Attitude;
+	float Altitude;
 	float Temperature;
 } BARO_UnitDataDef;
 
