@@ -62,6 +62,7 @@ int main(void)
 
 	/* Configure the system clock to 216 MHz */
 	SystemClock_Config();
+	SystemCoreClockUpdate();
 
 	MCU_GPIOs_Init();
 	SYSTEM_POWER_ON();
