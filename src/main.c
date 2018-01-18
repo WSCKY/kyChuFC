@@ -152,6 +152,7 @@ static void SystemMidFreqAThread(void const *p)
 	uint8_t TaskT = SYSTEM_TIMER_TICK * MIDA_FREQ_TASK_DIV_FACTOR;
 	for(;;) {
 		if( xSemaphoreTake( xSemaphore_MidFreqA, portMAX_DELAY ) == pdTRUE ) {
+			BARO_DataProcessTask(TaskT);
 			RF_DataProcessTask(TaskT);
 			FlyStateManageTask(TaskT);
 			FlightModeManageTask(TaskT);
@@ -175,11 +176,10 @@ static void SystemMidFreqBThread(void const *p)
 static void SystemSlowFreqThread(void const *p)
 {
 	(void) p;
-//	uint8_t TaskT = SYSTEM_TIMER_TICK * SLOW_FREQ_TASK_DIV_FACTOR;
+	uint8_t TaskT = SYSTEM_TIMER_TICK * SLOW_FREQ_TASK_DIV_FACTOR;
 	for(;;) {
 		if( xSemaphoreTake( xSemaphore_SlowFreq, portMAX_DELAY ) == pdTRUE ) {
-			// ...
-			BARO_MPC2520_Read();
+			(void) TaskT;
 		}
 	}
 }
