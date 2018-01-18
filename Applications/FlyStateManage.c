@@ -27,7 +27,7 @@ void FlyStateManageTask(uint8_t millis)
 
 	DroneReadyFlag = DroneReadyCheck();
 
-	if(FlyEnableLock == Locked) {
+	if((FlyEnableLock == Locked) && (DroneReadyFlag = 1)) {
 		UnlockTimeStamp ++;
 		if(UnlockTimeStamp * millis >= 500) UnlockStep = 0;
 		if((UnlockStep == 0 && pRF_CMD->Mode == FlightMode1) || \
