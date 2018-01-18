@@ -1,4 +1,4 @@
-#include "IrqManage.h"
+#include "DMAIrqManage.h"
 
 void DMA1_Stream0_IRQHandler(void)
 {
