@@ -3,6 +3,11 @@
 
 #include "stm32f7xx.h"
 
+typedef enum {
+	FALSE = 0,
+	TRUE = 1
+} _FC_BOOLEAN;
+
 typedef struct {
 	float X, Y;
 } _2AxisFloat;
