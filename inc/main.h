@@ -20,12 +20,12 @@
 #include "WaveView.h"
 
 #include "MCU_Periph.h"
-#include "BARO_MPC2520.h"
 #include "MotorControl.h"
 #include "FlyStateManage.h"
 #include "RF_DataProcess.h"
 #include "GyroStableCheck.h"
 #include "IMU_DataProcess.h"
+#include "BARO_DataProcess.h"
 #include "LEDIndicatorTask.h"
 #include "InnerControlLoop.h"
 #include "FlightModeManage.h"
