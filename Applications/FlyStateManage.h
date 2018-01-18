@@ -20,6 +20,7 @@ typedef enum {
 
 void FlyStateManageTask(uint8_t millis);
 
+uint8_t GetDroneReadyFlag(void);
 FLY_LOCK_STATE GetFlyLockState(void);
 FLY_ENABLE_STATE GetFlyEnableState(void);
 

@@ -85,5 +85,6 @@ static uint8_t FlyEnableCheck(void)
 	return 1;
 }
 
+inline uint8_t GetDroneReadyFlag(void) { return DroneReadyFlag; }
 inline FLY_LOCK_STATE GetFlyLockState(void) { return FlyEnableLock; }
 inline FLY_ENABLE_STATE GetFlyEnableState(void) { return FlyEnableFlag; }
