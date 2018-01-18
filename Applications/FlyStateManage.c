@@ -76,6 +76,7 @@ static uint8_t DroneReadyCheck(void)
 
 static uint8_t FlyEnableCheck(void)
 {
+	if(DroneReadyFlag == 0) return 0;
 	return 1;
 }
 
