@@ -71,12 +71,17 @@ void FlyStateManageTask(uint8_t millis)
 
 static uint8_t DroneReadyCheck(void)
 {
+	if(!GyroIsCalibrated()) return 0;
+	if(!AccIsStabled()) return 0;
+	if(!GetBaroOffsetedFlag()) return 0;
 	return 1;
 }
 
 static uint8_t FlyEnableCheck(void)
 {
 	if(DroneReadyFlag == 0) return 0;
+	if(RfSignalIsLost()) return 0;
+	if(GetBatteryState() >= LOW_POWER_LV2) return 0;
 	return 1;
 }
 

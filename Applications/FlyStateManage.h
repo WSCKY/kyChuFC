@@ -3,6 +3,10 @@
 
 #include "MotorControl.h"
 #include "RF_DataProcess.h"
+#include "GyroStableCheck.h"
+#include "IMU_DataProcess.h"
+#include "BARO_DataProcess.h"
+#include "SystemPowerManage.h"
 
 typedef enum {
 	Locked = 0,
