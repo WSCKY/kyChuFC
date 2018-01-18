@@ -4,9 +4,12 @@ static uint8_t _init_flag = 0;
 
 static RF_COMMAND_DEF *pRF_CMD = {0};
 
+static uint8_t DroneReadyFlag = 0;
+
 static FLY_LOCK_STATE FlyEnableLock = 0;
 static FLY_ENABLE_STATE FlyEnableFlag = 0;
 
+static uint8_t DroneReadyCheck(void);
 static uint8_t FlyEnableCheck(void);
 
 static uint8_t UnlockStep = 0;
@@ -21,6 +24,9 @@ void FlyStateManageTask(uint8_t millis)
 		FlyEnableFlag = Disabled;
 		pRF_CMD = GetRFCommand();
 	}
+
+	DroneReadyFlag = DroneReadyCheck();
+
 	if(FlyEnableLock == Locked) {
 		UnlockTimeStamp ++;
 		if(UnlockTimeStamp * millis >= 500) UnlockStep = 0;
@@ -61,6 +67,11 @@ void FlyStateManageTask(uint8_t millis)
 	} else if(FlyEnableTogCmdCnt == 1) {
 		FlyEnableTogCmdCnt = 2;
 	}
+}
+
+static uint8_t DroneReadyCheck(void)
+{
+	return 1;
 }
 
 static uint8_t FlyEnableCheck(void)
