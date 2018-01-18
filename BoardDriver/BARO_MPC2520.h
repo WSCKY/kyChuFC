@@ -2,7 +2,9 @@
 #define __BARO_MPC2520_H
 
 #include "BoardDefine.h"
+#include "SystemTypes.h"
 
+#define MPC2520_CHIP_ID                          0x10
 /* ----- Register Map ----- */
 #define PRESSURE_MSB_REG                         0x00 /* r */
 #define PRESSURE_LSB_REG                         0x01 /* r */
@@ -21,8 +23,6 @@
 #define CALIB_COEF_REG_START                     0x10
 #define CALIB_COEF_REG_END                       0x21
 
-#define PRESSURE_AT_SEA_LEVEL                    (1013.25f)
-
 typedef struct {
 	int16_t c0, c1, c01, c11, c20, c21, c30;
 	int32_t c00, c10;
@@ -35,5 +35,9 @@ typedef struct {
 	int32_t kP;
 	int32_t kT;
 } MPC2520_INIT_STRUCT;
+
+HAL_StatusTypeDef BARO_MPC2520_Init(void);
+HAL_StatusTypeDef BARO_MPC2520_Read(void);
+BARO_UnitDataDef *GetBARO_UNIT_DATA(void);
 
 #endif /* __BARO_MPC2520_H */
