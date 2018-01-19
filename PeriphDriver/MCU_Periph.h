@@ -7,5 +7,6 @@
 #include "MCU_UART.h"
 #include "MCU_USART.h"
 #include "MCU_TIM_PWM.h"
+#include "MCU_TIM_BASE.h"
 
 #endif /* __MCU_PERIPH_H */
