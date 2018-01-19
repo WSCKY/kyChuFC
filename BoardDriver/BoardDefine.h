@@ -70,4 +70,7 @@
 /* Battery Voltage Measure Linker */
 #define BATTERY_VOLT_RAW_VAL                     (*GetADC1ConvertedValue())
 
+/* System Precise Timer Linker */
+#define SYSTEM_PRECISE_TIMER_COUNTER()           MCU_TIM3_GetCounter()
+
 #endif /* __BOARDDEFINE_H */
