@@ -66,6 +66,9 @@ int main(void)
 
 	MCU_GPIOs_Init();
 	SYSTEM_POWER_ON();
+	if(MCU_PWMs_Init() != HAL_OK) {
+		while(1);
+	}
 	if(MCU_TIMs_Init() != HAL_OK) {
 		while(1);
 	}
