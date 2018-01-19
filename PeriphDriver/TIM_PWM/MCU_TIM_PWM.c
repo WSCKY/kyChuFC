@@ -40,11 +40,11 @@
 /* Private functions ---------------------------------------------------------*/
 
 /*
- * @brief  Initializes MCU TIMs.
+ * @brief  Initializes MCU PWMs.
  * @param  None
  * @retval HAL Status.
  */
-HAL_StatusTypeDef MCU_TIMs_Init(void)
+HAL_StatusTypeDef MCU_PWMs_Init(void)
 {
 	HAL_StatusTypeDef ret = HAL_OK;
 #if (TIM2_ENABLE)

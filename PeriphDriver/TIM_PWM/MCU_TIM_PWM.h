@@ -87,6 +87,7 @@ typedef enum {
 #endif /* TIM2_PWM_CHANNEL4_ENABLE */
 #endif /* TIM2_PWM_OUTPUT_ENABLE */
 #endif /* TIM2_ENABLE */
+
 #if (TIM5_ENABLE)
   /* Definition for TIM5 peripheral configuration */
   #define TIM5_COUNT_CLOCK_RATE                  (27000000)
@@ -128,7 +129,7 @@ typedef enum {
 #endif /* TIM5_PWM_OUTPUT_ENABLE */
 #endif /* TIM5_ENABLE */
 /* Exported functions ------------------------------------------------------- */
-HAL_StatusTypeDef MCU_TIMs_Init(void);
+HAL_StatusTypeDef MCU_PWMs_Init(void);
 #if (TIM2_ENABLE)
 void TIM2_SetPeriod(uint32_t Period);
 #if (TIM2_PWM_OUTPUT_ENABLE)
